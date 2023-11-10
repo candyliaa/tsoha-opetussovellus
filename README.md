@@ -4,8 +4,8 @@ Sovelluksen tavoitteena on sama toiminnallisuus kuin kurssin aiheista "opetussov
 Tarkalleen ottaen:
 -  Käyttäjätunnusten luonti ja kirjautuminen
 -  Erilaisia käyttäjätyyppejä; oppilailla ja opettajilla on eri toiminnallisuus
-  - Opiskelijat voivat liittyä kursseille ja tehdä tehtäviä, sekä tarkastelemaan niiden tilannetta - opiskelijat voivat myös nähdä suoritetut kurssit ja opintopistetilanteen
-  - Opettajat voivat luoda kursseja, muokata niitä ja poistaa niitä, sekä tarkastelemaan tilastoja
+    - Opiskelijat voivat liittyä kursseille ja tehdä tehtäviä, sekä tarkastelemaan niiden tilannetta - opiskelijat voivat myös nähdä suoritetut kurssit ja opintopistetilanteen
+    - Opettajat voivat luoda kursseja, muokata niitä ja poistaa niitä, sekä tarkastelemaan tilastoja
 
 # Ohjelman käynnistys
 Ohjelma on kirjoitettu Python -kielellä, käyttämällä tietokantana PostgreSQL -tietokantaa. Käytössä on Windows 10 -laite, jolla on WSL2 -asennus. 
@@ -24,7 +24,9 @@ https://flask.palletsprojects.com/en/3.0.x/installation/ (`flask` ja `flask-sqla
 
 https://pypi.org/project/psycopg2/ (`psycopg2`)
 
-Voit asentaa kirjastot komennolla
+https://pypi.org/project/python-dotenv/ (`python-dotenv`)
+
+Voit asentaa kirjastot seuraavalla komennolla:
 ```
-$ conda install
+$ conda install package
 ```
