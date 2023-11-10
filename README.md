@@ -37,3 +37,11 @@ Voit asentaa kirjastot seuraavalla komennolla:
 ```
 $ conda install package
 ```
+Määritä tietokannan skeema seuraavalla komennolla:
+```
+$ psql < schema.sql
+```
+Ohjelman voi nyt käynnistää tällä komennolla:
+```
+flask run
+```
