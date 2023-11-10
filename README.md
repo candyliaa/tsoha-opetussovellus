@@ -22,4 +22,6 @@ Projektissa on käytetty seuraavia kirjastoja:
 https://flask.palletsprojects.com/en/3.0.x/installation/ (`flask` ja `flask-sqlalchemy`)
 https://pypi.org/project/psycopg2/ (`psycopg2`)
 Voit asentaa kirjastot komennolla
-`$ conda install`
+```
+$ conda install
+```
