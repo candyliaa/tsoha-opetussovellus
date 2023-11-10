@@ -10,7 +10,14 @@ Tarkalleen ottaen:
 # Ohjelman käynnistys
 Ohjelma on kirjoitettu Python -kielellä, käyttämällä tietokantana PostgreSQL -tietokantaa. Käytössä on Windows 10 -laite, jolla on WSL2 -asennus. 
 Paketteja on hallittu Conda -ohjelman avulla: https://docs.conda.io/en/latest/
-Kloonaa ensin tämä repositorio, ja luo virtuaaliympäristö Condan avulla:
+
+Muut samankaltaiset pakettienhallintaohjelmat käyvät myös, mutta ohjeet ovat tehty olettaen, että käytössä on Conda.
+
+Kloonaa ensin tämä repositorio:
+```
+$ git clone https://github.com/candyliaa/tsoha-opetussovellus
+``` 
+ja luo virtuaaliympäristö Condan avulla:
 ```
 $ conda create --name nimi
 ```
