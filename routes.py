@@ -13,11 +13,11 @@ def index():
 
 @app.route("/login")
 def login():
-    name = request.form["name"]
+    username = request.form["username"]
     password = request.form["password"]
     account_type = request.form["role"]
-    sql = f"SELECT id, password FROM {account_type}_accounts WHERE name=:name"
-    result = db.session.execute(text(sql), {"name":name})
+    sql = f"SELECT id, password FROM {account_type}_accounts WHERE username=:username"
+    result = db.session.execute(text(sql), {"username":username})
     user = result.fetchone()
     if not user:
         # code for when user doesn't exist
@@ -30,21 +30,21 @@ def login():
         else:
             # invalid login
             pass
-    session["name"] = name
+    session["username"] = username
     return redirect("/")
 
 @app.route("/accountcreated", methods=["POST"])
 def accountcreated():
-    name = request.form["name"]
+    username = request.form["username"]
     password = request.form["password"]
     hash_value = generate_password_hash(password)
     account_type = request.form["role"]
-    sql = f"INSERT INTO {account_type}_accounts (name, password) VALUES (:name, :password)"
-    db.session.execute(text(sql), {"name":name, "password":hash_value})
+    sql = f"INSERT INTO {account_type}_accounts (username, password) VALUES (:username, :password)"
+    db.session.execute(text(sql), {"username":username, "password":hash_value})
     db.session.commit()
-    return render_template("accountcreated.html", name=request.form["name"])
+    return render_template("accountcreated.html", username=request.form["username"])
 
 @app.route("/logout")
 def logout():
-    del session["name"]
+    del session["username"]
     return redirect("/")
