@@ -6,10 +6,35 @@
 <b>Kirjaudu sisään:</b>
 <p>Oletko opiskelija vai opettaja?</p>
 <div class="flex">
-    <form action="/studentlogin" method="POST">
+    <form action="studentlogin" method="POST">
         <input type="submit" value="Opiskelija">
     </form>
-    <form action="/teacherlogin" method="POST">
+    <form action="teacherlogin" method="POST">
         <input type="submit" value="Opettaja">
     </form>
 </div>
+
+<b>Tai jos sinulla ei vielä ole tiliä, luo tili:</b>
+<br>
+<form action="accountcreated" method="POST">
+    <div class="flex_gap">
+        Käyttäjänimi:
+        <input type="text" name="name">
+        Salasana:
+        <input type="text" name="password">
+    </div>
+    Oletko opiskelija vai opettaja?
+    <div class="selection_gap">
+        <div>
+            <input type="radio" id="student" name="role" value="student">
+            <label for="student">Opiskelija</label>
+        </div>
+        <div>
+            <input type="radio" id="teacher" name="role" value="teacher">
+            <label for="teacher">Opettaja</label>
+        </div> 
+    </div>
+    <br>
+    <input type="submit" value="Luo tili">
+</form>
+
