@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS tsoha;
+
 CREATE DATABASE tsoha;
 
 \c tsoha
@@ -8,8 +10,8 @@ CREATE TABLE teacher_accounts (id SERIAL PRIMARY KEY, name TEXT, password TEXT);
 
 CREATE TABLE courses (id SERIAL PRIMARY KEY, name TEXT, credits INTEGER);
 
-CREATE TABLE course_teachers (course_id REFERENCES courses(id), teacher_id REFERENCES teacher_accounts(id));
+CREATE TABLE course_teachers (course_id INTEGER REFERENCES courses(id), teacher_id INTEGER REFERENCES teacher_accounts(id));
 
-CREATE TABLE course_participants (course_id REFERENCES courses(id), student_id REFERENCES student_accounts(id));
+CREATE TABLE course_participants (course_id INTEGER REFERENCES courses(id), student_id INTEGER REFERENCES student_accounts(id));
 
 CREATE TABLE exercises (id SERIAL PRIMARY KEY, type TEXT);
