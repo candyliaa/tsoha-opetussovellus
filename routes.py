@@ -2,7 +2,8 @@ from app import app
 from flask import render_template, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from os import getenv
-import db
+from db import db
+from sqlalchemy.sql import text
 
 app.secret_key = getenv("SECRET_KEY")
 
@@ -16,7 +17,7 @@ def login():
     password = request.form["password"]
     account_type = request.form["role"]
     sql = f"SELECT id, password FROM {account_type}_accounts WHERE name=:name"
-    result = db.session.execute(sql, {"name":name})
+    result = db.session.execute(text(sql), {"name":name})
     user = result.fetchone()
     if not user:
         # code for when user doesn't exist
@@ -38,16 +39,12 @@ def accountcreated():
     password = request.form["password"]
     hash_value = generate_password_hash(password)
     account_type = request.form["role"]
-    if account_type == "teacher":
-        table_type = "teacher_accounts"
-    else:
-        table_type = "student_accounts"
-    sql = f"INSERT INTO {table_type} (name, password) VALUES (:name, :password)"
-    db.session.execute(sql, {"username":name, "password":hash_value})
+    sql = f"INSERT INTO {account_type}_accounts (name, password) VALUES (:name, :password)"
+    db.session.execute(text(sql), {"name":name, "password":hash_value})
     db.session.commit()
     return render_template("accountcreated.html", name=request.form["name"])
 
 @app.route("/logout")
 def logout():
-    del session["username"]
+    del session["name"]
     return redirect("/")
