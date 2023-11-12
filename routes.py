@@ -42,7 +42,10 @@ def accountcreated():
     password = request.form["password"]
     hash_value = generate_password_hash(password)
     account_type = request.form["role"]
-    sql = f"INSERT INTO {account_type}_accounts (username, password) VALUES (:username, :password)"
+    if account_type == "teacher":
+        sql = "INSERT INTO teacher_accounts (username, password) VALUES (:username, :password)"
+    else:
+        sql = "INSERT INTO student_accounts (username, password) VALUES (:username, :password)"
     db.session.execute(text(sql), {"username":username, "password":hash_value})
     db.session.commit()
     session["username"] = username
