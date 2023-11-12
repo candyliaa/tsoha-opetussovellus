@@ -21,7 +21,7 @@ def login():
         result = db.session.execute(text(sql), {"username":username})
         user = result.fetchone()
         if not user:
-            # code for when user doesn't exist
+            return redirect("/login?failed=1")
             pass
         else:
             hash_value = user.password

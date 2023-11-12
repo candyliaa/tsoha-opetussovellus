@@ -1,8 +1,18 @@
 <form action="/login" method="POST">
+    {% if request.args.get("failed") == "1" %}
+    <p style="color:red">Tiliä ei ole olemassa, kokeile uudelleen.</p>
+    <p>Valitsitko väärän tilityypin?</p>
+    {% endif %}
+    <title>Kirjautuminen</title>
     Käyttäjänimi: <input type="text" name="username">
     <br>
     Salasana: <input type="text" name="password">
     <br>
     Oletko opiskelija vai opettaja?
+    <input type="radio" id="student" name="role" value="teacher">
+    <label for="student">Opiskelija</label>
+    <input type="radio" id="teacher" name="role" value="student">
+    <label for="teacher">Opettaja</label>
+    <br>
     <input type="submit" value="Kirjaudu">
 </form>
