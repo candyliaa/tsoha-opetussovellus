@@ -49,9 +49,16 @@ def accountcreated():
     db.session.execute(text(sql), {"username":username, "password":hash_value})
     db.session.commit()
     session["username"] = username
+    session["role"] = account_type
     return render_template("accountcreated.html", username=request.form["username"])
 
 @app.route("/logout")
 def logout():
     del session["username"]
     return redirect("/")
+
+@app.route("/coursetools")
+def coursetools():
+    if session["role"] != "teacher":
+        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    return render_template("coursetools.html")
