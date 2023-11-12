@@ -1,37 +1,40 @@
 from app import app
 from flask import render_template, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
-from os import getenv
 from db import db
 from sqlalchemy.sql import text
-
-app.secret_key = getenv("SECRET_KEY")
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    username = request.form["username"]
-    password = request.form["password"]
-    account_type = request.form["role"]
-    sql = f"SELECT id, password FROM {account_type}_accounts WHERE username=:username"
-    result = db.session.execute(text(sql), {"username":username})
-    user = result.fetchone()
-    if not user:
-        # code for when user doesn't exist
-        pass
-    else:
-        hash_value = user.password
-        if check_password_hash(hash_value, password):
-            # logged in
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        account_type = request.form["role"]
+        if account_type == "teacher":
+            sql = "SELECT id, password FROM teacher_accounts WHERE username=:username"
+        else:
+            sql = "SELECT id, password FROM student_accounts WHERE username=:username"
+        result = db.session.execute(text(sql), {"username":username})
+        user = result.fetchone()
+        if not user:
+            # code for when user doesn't exist
             pass
         else:
-            # invalid login
-            pass
-    session["username"] = username
-    return redirect("/")
+            hash_value = user.password
+            if check_password_hash(hash_value, password):
+                    session["username"] = username
+                    session["role"] = account_type
+                    return redirect("/")
+            else:
+                # invalid login
+                pass
+    else:
+        return render_template("login.html")
+
 
 @app.route("/accountcreated", methods=["POST"])
 def accountcreated():
@@ -42,6 +45,7 @@ def accountcreated():
     sql = f"INSERT INTO {account_type}_accounts (username, password) VALUES (:username, :password)"
     db.session.execute(text(sql), {"username":username, "password":hash_value})
     db.session.commit()
+    session["username"] = username
     return render_template("accountcreated.html", username=request.form["username"])
 
 @app.route("/logout")
