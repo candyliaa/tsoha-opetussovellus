@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-<title>Kurssityökalut</title>
+{% block title %}Kurssityökalut{% endblock %}
 <b>Mitä haluat tehdä?</b>
 {% block content %}
 <h2>Luo kurssi</h2>
@@ -22,4 +22,24 @@
     <p>Kurssi {{ request.args.get("name") }} on jo olemassa!</p>
     {% endif %}
 </form>
+<hr>
+<h2>Lista kursseista</h2>
+<table>
+    <thead>
+        <tr>
+            <th><b>Kurssi</b></th>
+            <th><b>Opintopisteet</b></th>
+            <th colspan="2"></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for course in courses %}
+        <tr>
+            <td>{{ course[0] }}</td>
+            <td>{{ course[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
