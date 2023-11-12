@@ -19,10 +19,14 @@
 <br>
 <form action="accountcreated" method="POST">
     <div class="flex_gap">
-        Käyttäjänimi:
-        <input type="text" name="username">
-        Salasana:
-        <input type="text" name="password">
+        <div>
+            <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
+            <input type="text" name="username" minlength="5" maxlength="20" required>
+        </div>
+        <div>
+            <label for="password">Salasana (Vähintään 5 merkkiä)</label>
+            <input type="text" name="password" minlength="5" required>
+        </div>
     </div>
     Oletko opiskelija vai opettaja?
     <div class="selection_gap">
