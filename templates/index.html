@@ -2,7 +2,7 @@
 
 {% if session.username %}
     <h1>Tervetuloa!</h1>
-    {% if session.role == teacher %}
+    {% if session.role == "teacher" %}
         <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
         <a href="/coursetools">Kurssityökalut</a>
         <br>
