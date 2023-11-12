@@ -1,2 +1,16 @@
+{% extends "layout.html" %}
+
 <title>Kurssityökalut</title>
 <b>Mitä haluat tehdä?</b>
+{% block content %}
+<h2>Luo kurssi</h2>
+<form action="/coursetools" method="POST">
+    <label for="course_name">Kurssin nimi:</label>
+    <input name="course_name" type="text" minlength="1" required>
+    <br>
+    <label for="credits">Opintopisteet:</label>
+    <input name="credits" type="number" min="0" max="10" required>
+    <br>
+    <input type="submit" value="Luo kurssi">
+</form>
+{% endblock %}
