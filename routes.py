@@ -35,7 +35,6 @@ def login():
     else:
         return render_template("login.html")
 
-
 @app.route("/accountcreated", methods=["POST"])
 def accountcreated():
     username = request.form["username"]
@@ -57,8 +56,20 @@ def logout():
     del session["username"]
     return redirect("/")
 
-@app.route("/coursetools")
+@app.route("/coursetools", methods=["POST", "GET"])
 def coursetools():
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    if request.method == "POST":
+        course_name = request.form["course_name"]
+        credits = int(request.form["credits"])
+        if len(course_name) < 1 or credits < 1:
+            return redirect("/coursetools?status=fail")
+        check_sql = "SELECT name FROM courses WHERE name=:course_name"
+        if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
+            return redirect(f"/coursetools?status=already_exists&name={course_name}")
+        sql = "INSERT INTO courses (name, credits) VALUES (:course_name, :credits)"
+        db.session.execute(text(sql), {"course_name": course_name, "credits": credits})
+        db.session.commit()
+        return redirect("/coursetools?status=success")
     return render_template("coursetools.html")
