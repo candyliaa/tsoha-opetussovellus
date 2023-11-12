@@ -1,8 +1,13 @@
 <link rel="stylesheet" href="styles.css">
 
 {% if session.username %}
-<h1>Tervetuloa, {{ session.username }}!</h1>
-<a href="/logout">Kirjaudu ulos</a>
+    <h1>Tervetuloa!</h1>
+    {% if session.role == teacher %}
+        <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
+    {% else %}
+        <h2>Olet kirjautuneena tilillä {{ session.username }} (opiskelijatili)</h2>
+    {% endif %}
+    <a href="/logout">Kirjaudu ulos</a>
 {% else %}
 <title>Opetussovellus</title>
 <h1>Opetussovellus</h1>
