@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<title>Opetussovellus - {% block title %}{% endblock %}</title>
-<h1>Opetussovellus</h1>
-<a href="/">Etusivu</a>
-<hr>
-{% block content %}{% endblock %}
-<hr>
+<head>
+    <title>Opetussovellus - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Opetussovellus</h1>
+    <a href="/">Etusivu</a>
+    <hr>
+    {% block content %}{% endblock %}
+    <hr>
+</body>
