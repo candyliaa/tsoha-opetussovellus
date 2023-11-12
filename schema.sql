@@ -8,7 +8,7 @@ CREATE TABLE student_accounts (id SERIAL PRIMARY KEY, username TEXT, password TE
 
 CREATE TABLE teacher_accounts (id SERIAL PRIMARY KEY, username TEXT, password TEXT);
 
-CREATE TABLE courses (id SERIAL PRIMARY KEY, username TEXT, credits INTEGER);
+CREATE TABLE courses (id SERIAL PRIMARY KEY, name TEXT, credits INTEGER);
 
 CREATE TABLE course_teachers (course_id INTEGER REFERENCES courses(id), teacher_id INTEGER REFERENCES teacher_accounts(id));
 
