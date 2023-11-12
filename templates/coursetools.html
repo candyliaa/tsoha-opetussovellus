@@ -9,8 +9,17 @@
     <input name="course_name" type="text" minlength="1" required>
     <br>
     <label for="credits">Opintopisteet:</label>
-    <input name="credits" type="number" min="0" max="10" required>
+    <input name="credits" type="number" style="width: 35px" value="5" min="0" max="10" required>
     <br>
     <input type="submit" value="Luo kurssi">
+    {% if request.args.get("status") == "success" %}
+    <p>Kurssi luotu onnistuneesti!</p>
+    {% endif %}
+    {% if request.args.get("status") == "fail" %}
+    <p>Kurssin luonti epäonnistui, yritä uudelleen.</p>
+    {% endif %}
+    {% if request.args.get("status") == "already_exists" %}
+    <p>Kurssi {{ request.args.get("name") }} on jo olemassa!</p>
+    {% endif %}
 </form>
 {% endblock %}
