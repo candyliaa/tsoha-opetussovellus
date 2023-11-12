@@ -11,6 +11,8 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        if not "username" in request.form or "password" not in request.form or "role" not in request.form:
+            return redirect("/login?failed=1")
         username = request.form["username"]
         password = request.form["password"]
         account_type = request.form["role"]
@@ -22,7 +24,6 @@ def login():
         user = result.fetchone()
         if not user:
             return redirect("/login?failed=1")
-            pass
         else:
             hash_value = user.password
             if check_password_hash(hash_value, password):
@@ -30,8 +31,7 @@ def login():
                     session["role"] = account_type
                     return redirect("/")
             else:
-                # invalid login
-                pass
+                return redirect("/login?failed=2")
     else:
         return render_template("login.html")
 
