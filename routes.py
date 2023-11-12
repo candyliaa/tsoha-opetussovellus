@@ -72,4 +72,5 @@ def coursetools():
         db.session.execute(text(sql), {"course_name": course_name, "credits": credits})
         db.session.commit()
         return redirect("/coursetools?status=success")
-    return render_template("coursetools.html")
+    courses = db.session.execute(text("SELECT name, credits FROM courses ORDER BY name DESC")).fetchall()
+    return render_template("coursetools.html", courses=courses)
