@@ -1,12 +1,16 @@
-    {% if request.args.get("failed") == "1" %}
-    <title>Kirjautuminen epäonnistui</title>
-    <p style="color:red">Tiliä ei ole olemassa, kokeile uudelleen.</p>
-    <p>Valitsitko väärän tilityypin?</p>
-    {% endif %}
-    {% if request.args.get("failed") == "2" %}
-    <title>Salasana väärin</title>
-    <p style="color:red">Salasana on väärin, kokeile uudelleen.</p>
-    {% endif %}
+{% extends "layout.html" %}
+{% block title %}Kirjautuminen{% endblock %}
+
+{% block content %}
+{% if request.args.get("failed") == "1" %}
+<title>Kirjautuminen epäonnistui</title>
+<p style="color:red">Tiliä ei ole olemassa, kokeile uudelleen.</p>
+<p>Valitsitko väärän tilityypin?</p>
+{% endif %}
+{% if request.args.get("failed") == "2" %}
+<title>Salasana väärin</title>
+<p style="color:red">Salasana on väärin, kokeile uudelleen.</p>
+{% endif %}
 <form action="/login" method="POST">
     <title>Kirjautuminen</title>
     Käyttäjänimi: <input type="text" name="username" minlength="5" maxlength="20" required>
@@ -22,3 +26,4 @@
     <input type="submit" value="Kirjaudu">
 </form>
 <a href="/">Takaisin pääsivulle</a>
+{% endblock %}

@@ -1,5 +1,9 @@
 <link rel="stylesheet" href="styles.css">
 
+{% extends "layout.html" %}
+{% block title %}Etusivu{% endblock %}
+
+{% block content %}
 {% if session.username %}
     <h1>Tervetuloa!</h1>
     {% if session.role == "teacher" %}
@@ -12,15 +16,15 @@
     <a href="/logout">Kirjaudu ulos</a>
 {% else %}
 <title>Opetussovellus</title>
-<h1>Opetussovellus</h1>
-<h2>Tervetuloa!</h2>
-<a href="/login">Kirjaudu sisään</a>
-<br>
-
-<b>Tai jos sinulla ei vielä ole tiliä, luo tili:</b>
-<br>
+<h1>Tervetuloa!</h1>
 <form action="accountcreated" method="POST">
     <div class="flex_gap">
+        <div>
+            <a href="/login">Kirjaudu sisään</a>
+        </div>
+        <div>
+            <b>Tai jos sinulla ei vielä ole tiliä, luo tili:</b>
+        </div>
         <div>
             <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
             <input type="text" name="username" minlength="5" maxlength="20" required>
@@ -45,3 +49,4 @@
     <input type="submit" value="Luo tili">
 </form>
 {% endif %}
+{% endblock %}
