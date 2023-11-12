@@ -14,4 +14,4 @@ CREATE TABLE course_teachers (course_id INTEGER REFERENCES courses(id), teacher_
 
 CREATE TABLE course_participants (course_id INTEGER REFERENCES courses(id), student_id INTEGER REFERENCES student_accounts(id));
 
-CREATE TABLE exercises (id SERIAL PRIMARY KEY, type TEXT);
+CREATE TABLE exercises (id SERIAL PRIMARY KEY, type TEXT, course_id INTEGER REFERENCES courses(id));
