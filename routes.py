@@ -73,7 +73,7 @@ def coursetools():
         sql = "INSERT INTO courses (name, credits) VALUES (:course_name, :credits)"
         db.session.execute(text(sql), {"course_name": course_name, "credits": credits})
         db.session.commit()
-        return redirect("/coursetools?status=success")
+        return redirect(f"/coursetools?status=success&name={course_name}")
     courses = db.session.execute(text("SELECT id, name, credits FROM courses ORDER BY name ASC")).fetchall()
     return render_template("coursetools.html", courses=courses)
 

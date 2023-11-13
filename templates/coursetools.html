@@ -13,7 +13,7 @@
     <br>
     <input type="submit" value="Luo kurssi">
     {% if request.args.get("status") == "success" %}
-    <p>Kurssi luotu onnistuneesti!</p>
+    <p>Kurssi {{ request.args.get("name") }} luotu onnistuneesti!</p>
     {% endif %}
     {% if request.args.get("status") == "fail" %}
     <p>Kurssin luonti epäonnistui, yritä uudelleen.</p>
@@ -27,6 +27,10 @@
 {% if request.args.get("status") == "deleted" %}
 <p>Kurssi {{ request.args.get("name") }} poistettu onnistuneesti!</p>
 {% endif %}
+
+{% if courses|length == 0 %}
+<h3>Kurssilista on tyhjä.</h3>
+{% else %}
 <table>
     <thead>
         <tr>
@@ -47,4 +51,5 @@
         {% endfor %}
     </tbody>
 </table>
+{% endif %}
 {% endblock %}
