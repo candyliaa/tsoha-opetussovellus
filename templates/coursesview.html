@@ -1,11 +1,16 @@
 {% extends "layout.html" %}
-
 {% block title %}Kurssinäkymä{% endblock %}
+
 {% block content %}
 <h2>Omat kurssit</h2>
-{% if request.args.get("status") == left %}
+{% if request.args.get("status") == "left" %}
 <p>Lähdit kurssilta {{ request.args.get("name") }}.</p>
 {% endif %}
+
+{% if request.args.get("status") == "joined" %}
+<p>Liityit kurssille {{ request.args.get("name") }}.</p>
+{% endif %}
+
 {% if own_courses|length == 0 %}
 <h3>Et ole millään kursseilla.</h3>
 {% else %}
