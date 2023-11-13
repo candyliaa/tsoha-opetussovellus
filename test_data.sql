@@ -10,3 +10,6 @@ INSERT INTO teacher_accounts (username, password) VALUES ('opettaja2', 'pbkdf2:s
 
 INSERT INTO courses (name, credits) VALUES ('ohpe', 5);
 INSERT INTO courses (name, credits) VALUES ('ohja', 5);
+
+INSERT INTO course_teachers(course_id, teacher_id) VALUES (1, 1);
+INSERT INTO course_participants(course_id, student_id) VALUES (1, 1);
