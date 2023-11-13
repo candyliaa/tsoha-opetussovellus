@@ -118,6 +118,7 @@ def coursesview():
           LEFT JOIN teacher_accounts ON
           course_teachers.teacher_id = teacher_accounts.id
           WHERE course_participants.student_id = :student_id
+          ORDER BY name ASC
           """
     own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
     other_courses_sql = """
@@ -129,6 +130,7 @@ def coursesview():
                   LEFT JOIN teacher_accounts ON
                   course_teachers.teacher_id = teacher_accounts.id
                   WHERE COALESCE(course_participants.student_id <> :student_id, TRUE)
+                  ORDER BY name ASC
                   """
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
     return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
@@ -137,15 +139,29 @@ def coursesview():
 def leavecourse():
     course_id = request.args.get("id")
     student_id = session["user_id"]
-    course_name_sql = """
-                      SELECT name FROM courses
-                      WHERE id = :course_id
-                      """
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
     leave_course_sql = """
                        DELETE FROM course_participants
-                       WHERE student_id = :student_id
+                       WHERE student_id = :student_id AND
+                       course_id = :course_id
                        """
-    db.session.execute(text(leave_course_sql), {"student_id": student_id})
+    db.session.execute(text(leave_course_sql), {"student_id": student_id, "course_id": course_id})
     db.session.commit()
-    return redirect(f"/courseview?status=left&name={course_name}")
+    return redirect(f"/coursesview?status=left&name={course_name}")
+
+@app.route("/joincourse")
+def joincourse():
+    course_id = request.args.get("id")
+    print(course_id)
+    student_id = session["user_id"]
+    print(student_id)
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
+    course_join_sql = """
+                      INSERT INTO course_participants (course_id, student_id)
+                      VALUES (:course_id, :student_id)
+                      """
+    db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
+    db.session.commit()
+    return redirect(f"/coursesview?status=joined&name={course_name}")
