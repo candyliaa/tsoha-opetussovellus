@@ -96,3 +96,12 @@ def deletecourse():
     db.session.execute(text(sql), {"course_id":course_id})
     db.session.commit()
     return redirect(f"/coursetools?status=deleted&name={course_name}")
+
+@app.route("/coursesview", methods=["POST", "GET"])
+def coursesview():
+    if "role" not in session.keys():
+        return render_template("error.html", error="Ei oikeutta nähddä tätä sivua")
+    if session["role"] != "student":
+        return render_template("error.html", error="Et ole opiskelija")
+    return render_template("/coursesview.html")
+
