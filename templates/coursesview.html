@@ -3,6 +3,9 @@
 {% block title %}Kurssinäkymä{% endblock %}
 {% block content %}
 <h2>Omat kurssit</h2>
+{% if own_courses|length == 0 %}
+<h3>Et ole millään kursseilla.</h3>
+{% else %}
 <table>
     <thead>
         <tr>
@@ -17,10 +20,13 @@
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
             <td>{{ course["teacher_names"] }}</td>
+            <td><a href="/leavecourse?id={{course['id']}}" style="color: red">Poistu kurssilta</a></td>
+            <td><a href="/exercises?id={{course['id']}}">Tee tehtäviä</a></td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
+{% endif %}
 <hr>
 <h2>Kurssitarjonta</h2>
 {% if other_courses|length == 0 %}
@@ -41,7 +47,7 @@
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
             <td>{{ course["teacher_names"] }}</td>
-            <td><a href="/joincourse?id={{course[0]}}"></a></td>
+            <td><a href="/joincourse?id={{course['id']}}" style="color: green">Liity kurssille</a></td>
         </tr>
         {% endfor %}
     </tbody>

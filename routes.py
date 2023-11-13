@@ -107,7 +107,6 @@ def coursesview():
         return render_template("error.html", error="Ei oikeutta nähddä tätä sivua")
     if session["role"] != "student":
         return render_template("error.html", error="Et ole opiskelija")
-    username = session["username"]
     user_id = session["user_id"]
     print(user_id)
     own_courses_sql = """
@@ -122,7 +121,7 @@ def coursesview():
           """
     own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
     other_courses_sql = """
-                  SELECT course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
+                  SELECT courses.id, course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
                   LEFT JOIN course_participants ON
                   courses.id = course_participants.course_id
                   LEFT JOIN course_teachers ON
@@ -134,3 +133,19 @@ def coursesview():
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
     return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
 
+@app.route("/leavecourse")
+def leavecourse():
+    course_id = request.args.get("id")
+    student_id = session["user_id"]
+    course_name_sql = """
+                      SELECT name FROM courses
+                      WHERE id = :course_id
+                      """
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
+    leave_course_sql = """
+                       DELETE FROM course_participants
+                       WHERE student_id = :student_id
+                       """
+    db.session.execute(text(leave_course_sql), {"student_id": student_id})
+    db.session.commit()
+    return redirect(f"/courseview?status=left&name={course_name}")
