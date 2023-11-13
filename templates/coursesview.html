@@ -3,9 +3,27 @@
 {% block title %}Kurssinäkymä{% endblock %}
 {% block content %}
 <h2>Omat kurssit</h2>
+<table>
+    <thead>
+        <tr>
+            <th><b>Kurssi</b></th>
+            <th><b>Opintopisteet</b></th>
+            <th><b>Opettajat</b></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for course in own_courses %}
+        <tr>
+            <td>{{ course["name"] }}</td>
+            <td>{{ course["credits"] }}</td>
+            <td>{{ course["teacher_names"] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 <hr>
 <h2>Kurssitarjonta</h2>
-{% if courses|length == 0 %}
+{% if other_courses|length == 0 %}
 <h3>Kurssilista on tyhjä.</h3>
 {% else %}
 <table>
@@ -14,19 +32,16 @@
             <th><b>Kurssi</b></th>
             <th><b>Opintopisteet</b></th>
             <th><b>Opettajat</b></th>
-            <th><b>Opiskelijoita</b></th>
-            <th colspan="2"></th>
+            <th colspan="1"></th>
         </tr>
     </thead>
     <tbody>
-        {% for course in courses %}
+        {% for course in other_courses %}
         <tr>
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
             <td>{{ course["teacher_names"] }}</td>
-            <td>{{ course["student_count"] }}</td>
-            <td><a href="/deletecourse?id={{course[0]}}" style="color: red">Poista kurssi</a></td>
-            <td><a href="/modifycourse?id={{course[0]}}">Muokkaa kurssia</a></td>
+            <td><a href="/joincourse?id={{course[0]}}"></a></td>
         </tr>
         {% endfor %}
     </tbody>

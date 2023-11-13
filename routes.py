@@ -109,6 +109,7 @@ def coursesview():
         return render_template("error.html", error="Et ole opiskelija")
     username = session["username"]
     user_id = session["user_id"]
+    print(user_id)
     own_courses_sql = """
           SELECT courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
           LEFT JOIN course_participants ON
@@ -120,15 +121,16 @@ def coursesview():
           WHERE course_participants.student_id = :student_id
           """
     own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
-    courses_sql = """
-                  SELECT courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
+    other_courses_sql = """
+                  SELECT course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
                   LEFT JOIN course_participants ON
                   courses.id = course_participants.course_id
                   LEFT JOIN course_teachers ON
                   courses.id = course_teachers.course_id
                   LEFT JOIN teacher_accounts ON
                   course_teachers.teacher_id = teacher_accounts.id
-                  WHERE course_participants.student_id = :student_id
+                  WHERE COALESCE(course_participants.student_id <> :student_id, TRUE)
                   """
-    return render_template("/coursesview.html", own_courses=own_courses)
+    other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
+    return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
 
