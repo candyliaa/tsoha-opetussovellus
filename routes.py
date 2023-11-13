@@ -58,6 +58,8 @@ def logout():
 
 @app.route("/coursetools", methods=["POST", "GET"])
 def coursetools():
+    if not "role" in session.keys():
+        return render_template("error.html", error="Ei oikeutta nähdä sivua")
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
     if request.method == "POST":
@@ -72,5 +74,17 @@ def coursetools():
         db.session.execute(text(sql), {"course_name": course_name, "credits": credits})
         db.session.commit()
         return redirect("/coursetools?status=success")
-    courses = db.session.execute(text("SELECT name, credits FROM courses ORDER BY name DESC")).fetchall()
+    courses = db.session.execute(text("SELECT id, name, credits FROM courses ORDER BY name ASC")).fetchall()
     return render_template("coursetools.html", courses=courses)
+
+@app.route("/deletecourse")
+def deletecourse():
+    course_id = request.args.get("id")
+    if session["role"] != "teacher":
+        return render_template("error.html", error="Ei oikeutta tähän toimintoon")
+    course_name_sql = "SELECT name FROM courses WHERE id =:course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
+    sql = "DELETE FROM courses WHERE id =:course_id"
+    db.session.execute(text(sql), {"course_id":course_id})
+    db.session.commit()
+    return redirect(f"/coursetools?status=deleted&name={course_name}")

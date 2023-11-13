@@ -24,20 +24,25 @@
 </form>
 <hr>
 <h2>Lista kursseista</h2>
+{% if request.args.get("status") == "deleted" %}
+<p>Kurssi {{ request.args.get("name") }} poistettu onnistuneesti!</p>
+{% endif %}
 <table>
     <thead>
         <tr>
             <th><b>Kurssi</b></th>
             <th><b>Opintopisteet</b></th>
+            <th><b></b></th>
             <th colspan="2"></th>
         </tr>
     </thead>
     <tbody>
-
         {% for course in courses %}
         <tr>
-            <td>{{ course[0] }}</td>
             <td>{{ course[1] }}</td>
+            <td>{{ course[2] }}</td>
+            <td><a href="/deletecourse?id={{course[0]}}">Poista kurssi</a></td>
+            <td><a href="/modifycourse?id={{course[0]}}">Muokkaa kurssia</a></td>
         </tr>
         {% endfor %}
     </tbody>
