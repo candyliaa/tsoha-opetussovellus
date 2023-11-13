@@ -10,7 +10,9 @@
         <br>
     {% else %}
         <h2>Olet kirjautuneena tilillä {{ session.username }} (opiskelijatili)</h2>
+        <a href="/coursesview">Kurssinäkymään</a>
     {% endif %}
+    <br>
     <a href="/logout">Kirjaudu ulos</a>
 {% else %}
 <title>Opetussovellus</title>
