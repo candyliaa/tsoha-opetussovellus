@@ -10,20 +10,83 @@
 {% endif %}
 <button onclick="openForm()">Lisää tehtävä</button>
 <div id="exerciseform" style="display: none">
-    <p>Testi</p>
+    <br>
+    <button onclick="openTextExercise()">Tekstitehtävä </button>
+    <button onclick="openMultipleChoiceExercise()">Monivalintatehtävä</button>
+</div>
+<div id="textform" style="display: none">
+    <form action="/modifycourse?status=text_exercise_created" method="POST">
+        <label for="exercise_name">Tehtävän kysymys:</label>
+        <br>
+        <input name="exercise_name" type="text" minlength="1" required>
+        <br>
+        Mallivastaus:
+        <br>
+        <textarea name="example_answer" rows="3" cols="50"></textarea>
+        <br>
+        <input type="submit" value="Luo tehtävä">
+    </form>
+</div>
+<div id="multiplechoiceform" style="display: none">
+    <form action="/modifycourse?status=multiple_choice_created" method="POST">
+        <label for="exercise_name">Tehtävän kysymys:</label>
+        <br>
+        <input name="exercise_name" type="text" minlength="1" required>
+        <br>
+        Valinnat:
+        <br>
+        <ul id="list-choices">
+            <li><input name="choices[]" type="text" required></li>
+            <li><input name="choices[]" type="text" required></li>
+        </ul>
+        <template id="choice-input-template">
+            <li><input type="text" name="choices[]" required></li>
+        </template>
+    <br>
+    <button onclick="addChoice()">Lisää valinta</button>
+    <input type="submit" value="Luo tehtävä">
+    </form>
 </div>
 <br style="line-height: 2">
 <a href="/deletecourse?id={{course['id']}}" style="color: red">Poista kurssi</a>
 <hr>
 <h2>Tilastoja:</h2>
+<!--Scripts for the buttons on this page-->
 <script>
     function openForm() {
-        var x = document.getElementById("exerciseform")
+        var x = document.getElementById("exerciseform");
         if (x.style.display === "none") {
             x.style.display = "block";
         } else {
-            x.style.display = "none"
+            x.style.display = "none";
         }
+    }
+</script>
+<script>
+    function openTextExercise() {
+        var x = document.getElementById("textform");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display ="none";
+        }
+    }
+</script>
+<script>
+    function openMultipleChoiceExercise() {
+        var x = document.getElementById("multiplechoiceform");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display ="none";
+        }
+    }
+</script>
+<script>
+    function addChoice() {
+        const ul = document.getElementById("list-choices");
+        const newChoice = document.getElementById("choice-input-template").content.cloneNode(true);
+        ul.appendChild(newChoice);
     }
 </script>
 {% endblock %}
