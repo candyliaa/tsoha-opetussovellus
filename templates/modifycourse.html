@@ -3,19 +3,21 @@
 
 {% block content %}
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
-{% if course["exercises"] is none %}
+{% if course_exercises|length == 0 %}
 <h3>Kurssilla ei ole tehtäviä.</h3>
 {% else %}
-<h3>tehtäviä: {{ course["exercises"] }}</h3>
+<h3>Tehtäviä: {{ course_exercises|length }}</h3>
 {% endif %}
-<button onclick="openForm()">Lisää tehtävä</button>
+<button onclick="openForm()">Lisää tehtävä </button>
 <div id="exerciseform" style="display: none">
     <br>
-    <button onclick="openTextExercise()">Tekstitehtävä </button>
+    <button onclick="openTextExercise()">Tekstitehtävä</button>
     <button onclick="openMultipleChoiceExercise()">Monivalintatehtävä</button>
 </div>
 <div id="textform" style="display: none">
-    <form action="/modifycourse?status=text_exercise_created" method="POST">
+    <form action="/exercisecreated" method="POST">
+        <input type="hidden" name="course_id" value="{{ course['id'] }}">
+        <input type="hidden" name="exercise_type" value="text_question">
         <label for="exercise_name">Tehtävän kysymys:</label>
         <br>
         <input name="exercise_name" type="text" minlength="1" required>
@@ -28,7 +30,7 @@
     </form>
 </div>
 <div id="multiplechoiceform" style="display: none">
-    <form action="/modifycourse?status=multiple_choice_created" method="POST">
+    <form action="/modifycourse?status=multiple_choice_created&id={{course['id']}}" method="POST">
         <label for="exercise_name">Tehtävän kysymys:</label>
         <br>
         <input name="exercise_name" type="text" minlength="1" required>
@@ -44,7 +46,7 @@
         </template>
     <br>
     <button onclick="addChoice()">Lisää valinta</button>
-    <input type="submit" value="Luo tehtävä">
+    <button onclick="submit()">Luo tehtävä</button>
     </form>
 </div>
 <br style="line-height: 2">
