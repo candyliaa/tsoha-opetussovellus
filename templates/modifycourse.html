@@ -54,37 +54,37 @@
 <!--Scripts for the buttons on this page-->
 <script>
     function openForm() {
-        const x = document.getElementById("exerciseform");
-        if (x.style.display === "none") {
-            x.style.display = "block";
+        const form = document.getElementById("exerciseform");
+        if (form.style.display === "none") {
+            form.style.display = "block";
         } else {
-            x.style.display = "none";
+            form.style.display = "none";
         }
     }
 
     function openTextExercise() {
-        var x = document.getElementById("textform");
-        if (x.style.display === "none") {
-            x.style.display = "block";
+        var textForm = document.getElementById("textform");
+        if (textForm.style.display === "none") {
+            textForm.style.display = "block";
         } else {
-            x.style.display ="none";
+            textForm.style.display ="none";
         }
-        var y = document.getElementById("multiplechoiceform")
-        if (y.style.display === "block") {
-            y.style.display = "none"
+        var multipleChoiceForm = document.getElementById("multiplechoiceform")
+        if (multipleChoiceForm.style.display === "block") {
+            multipleChoiceForm.style.display = "none"
         }
     }
 
     function openMultipleChoiceExercise() {
-        var x = document.getElementById("multiplechoiceform");
-        if (x.style.display === "none") {
-            x.style.display = "block";
+        var multipleChoiceForm = document.getElementById("multiplechoiceform");
+        if (multipleChoiceForm.style.display === "none") {
+            multipleChoiceForm.style.display = "block";
         } else {
-            x.style.display ="none";
+            multipleChoiceForm.style.display ="none";
         }
-        var y = document.getElementById("textform")
-        if (y.style.display === "block") {
-            y.style.display = "none"
+        var textForm = document.getElementById("textform")
+        if (textForm.style.display === "block") {
+            textForm.style.display = "none"
         }
     }
 
