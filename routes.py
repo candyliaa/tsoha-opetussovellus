@@ -163,9 +163,7 @@ def leavecourse():
 @app.route("/joincourse")
 def joincourse():
     course_id = request.args.get("id")
-    print(course_id)
     student_id = session["user_id"]
-    print(student_id)
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
     course_join_sql = """
