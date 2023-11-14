@@ -36,8 +36,8 @@
         Valinnat:
         <br>
         <ul id="list-choices">
-            <li><input name="choices[]" type="text" required></li>
-            <li><input name="choices[]" type="text" required></li>
+            <li><input type="checkbox" class="correct_answers" checked="true"><input name="choices[]" type="text" class="choices" required></li>
+            <li><input type="checkbox" class="correct_answers"><input name="choices[]" type="text" class="choices" required ></li>
         </ul>
         <template id="choice-input-template">
             <li><input type="text" name="choices[]" required></li>
@@ -61,8 +61,7 @@
             x.style.display = "none";
         }
     }
-</script>
-<script>
+
     function openTextExercise() {
         var x = document.getElementById("textform");
         if (x.style.display === "none") {
@@ -71,8 +70,7 @@
             x.style.display ="none";
         }
     }
-</script>
-<script>
+
     function openMultipleChoiceExercise() {
         var x = document.getElementById("multiplechoiceform");
         if (x.style.display === "none") {
@@ -81,12 +79,17 @@
             x.style.display ="none";
         }
     }
-</script>
-<script>
+
     function addChoice() {
         const ul = document.getElementById("list-choices");
         const newChoice = document.getElementById("choice-input-template").content.cloneNode(true);
         ul.appendChild(newChoice);
     }
+
+    function submit() {
+        const choices = Array.from(document.getElementsByClassName("choices")).map(i => i.value);
+        const correctAnswers = Array.from(document.getElementsByClassName("correct_answers")).map(i => i.checked)
+    }
 </script>
+
 {% endblock %}
