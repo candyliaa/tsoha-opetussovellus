@@ -110,7 +110,9 @@ def modifycourse():
     course_id = request.args.get("id")
     course_sql = "SELECT id, name, credits, exercises FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
-    return render_template(f"/modifycourse.html", course=course)
+    course_exercises_sql = "SELECT question, choices FROM exercises WHERE course_id = :course_id"                     
+    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
+    return render_template(f"/modifycourse.html", course=course, course_exercises=course_exercises)
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
