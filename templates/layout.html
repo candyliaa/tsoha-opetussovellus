@@ -2,6 +2,15 @@
 <head>
     <title>Opetussovellus - {% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="styles.css">
+{% if session.username %}
+<div class="top_right">
+    <p>Olet kirjautuneena tilillä: {{ session.username }}</p>
+    <a href="/logout">Kirjaudu ulos</a>
+</div>
+
+{% else %}
+<p class="top_right">Et ole kirjautunut sisään.</p>
+{% endif %}
 </head>
 <body>
     <h1>Opetussovellus</h1>
