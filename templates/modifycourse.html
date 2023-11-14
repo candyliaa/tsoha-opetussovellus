@@ -2,5 +2,13 @@
 {% block title %}Kurssin muokkaus{% endblock %}
 
 {% block content %}
-<h2>Valittu kurssi: {{ course_name }}</h2>
+<h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
+{% if course["exercises"] is none %}
+<h3>Kurssilla ei ole tehtäviä.</h3>
+{% else %}
+<h3>tehtäviä: {{ course["exercises"] }}</h3>
+{% endif %}
+<a href="/addexercise?id={{course['id']}}">Lisää tehtävä</a>
+<br>
+<a href="/deletecourse?id={{course['id']}}" style="color: red">Poista kurssi</a>
 {% endblock %}
