@@ -102,7 +102,7 @@ def deletecourse():
     db.session.commit()
     return redirect(f"/coursetools?status=deleted&name={course_name}")
 
-@app.route("/modifycourse")
+@app.route("/modifycourse", methods=["POST", "GET"])
 def modifycourse():
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
@@ -110,6 +110,23 @@ def modifycourse():
     course_sql = "SELECT id, name, credits, exercises FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
     return render_template(f"/modifycourse.html", course=course)
+
+@app.route("/exercisecreated", methods=["POST"])
+def exercisecreated():
+    if session["role"] != "teacher":
+        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    if request.method == "POST":
+        course_id = request.args.get("id")
+        question = request.form["exercise_name"]
+        if request.form["exercise_type"] == "text_question":
+            example_answer = request.form["example_answer"]
+            add_course_sql = """
+                            INSERT INTO exercises (question, choices, course_id)
+                            VALUES (:question, :choices, :course_id)
+                            """
+            db.session.execute(text(add_course_sql), {"question": question, "choices": example_answer, "course_id": course_id})
+            db.session.commit()
+        return redirect(f"/modifycourse?status=successfully_created")
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
