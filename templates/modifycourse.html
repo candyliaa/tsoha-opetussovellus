@@ -40,7 +40,7 @@
             <li><input type="checkbox" class="correct_answers"><input name="choices[]" type="text" class="choices" required ></li>
         </ul>
         <template id="choice-input-template">
-            <li><input type="text" name="choices[]" required></li>
+            <li><input type="checkbox" class="correct_answers"><input type="text" name="choices[]" required></li>
         </template>
     <br>
     <button onclick="addChoice()">Lisää valinta</button>
@@ -54,7 +54,7 @@
 <!--Scripts for the buttons on this page-->
 <script>
     function openForm() {
-        var x = document.getElementById("exerciseform");
+        const x = document.getElementById("exerciseform");
         if (x.style.display === "none") {
             x.style.display = "block";
         } else {
@@ -69,6 +69,10 @@
         } else {
             x.style.display ="none";
         }
+        var y = document.getElementById("multiplechoiceform")
+        if (y.style.display === "block") {
+            y.style.display = "none"
+        }
     }
 
     function openMultipleChoiceExercise() {
@@ -77,6 +81,10 @@
             x.style.display = "block";
         } else {
             x.style.display ="none";
+        }
+        var y = document.getElementById("textform")
+        if (y.style.display === "block") {
+            y.style.display = "none"
         }
     }
 
@@ -91,5 +99,4 @@
         const correctAnswers = Array.from(document.getElementsByClassName("correct_answers")).map(i => i.checked)
     }
 </script>
-
 {% endblock %}
