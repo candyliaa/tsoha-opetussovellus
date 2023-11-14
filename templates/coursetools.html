@@ -46,7 +46,11 @@
         <tr>
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
+            {% if course["teacher_names"] is not none %}
             <td>{{ course["teacher_names"] }}</td>
+            {% else %}
+            <td>Ei opettajia</td>
+            {% endif %}
             <td>{{ course["student_count"] }}</td>
             <td><a href="/deletecourse?id={{course[0]}}" style="color: red">Poista kurssi</a></td>
             <td><a href="/modifycourse?id={{course[0]}}">Muokkaa kurssia</a></td>
