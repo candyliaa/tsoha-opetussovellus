@@ -107,9 +107,9 @@ def modifycourse():
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
     course_id = request.args.get("id")
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id})
-    return render_template(f"/modifycourse.html", course_name=course_name)
+    course_sql = "SELECT id, name, credits, exercises FROM courses WHERE id = :course_id"
+    course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
+    return render_template(f"/modifycourse.html", course=course)
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
