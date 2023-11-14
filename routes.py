@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from db import db
 from sqlalchemy.sql import text
+import json
 
 @app.route("/")
 def index():
@@ -116,17 +117,18 @@ def exercisecreated():
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
     if request.method == "POST":
-        course_id = request.args.get("id")
+        course_id = request.form["course_id"]
         question = request.form["exercise_name"]
         if request.form["exercise_type"] == "text_question":
             example_answer = request.form["example_answer"]
+            example_answer = json.dumps(example_answer)
             add_course_sql = """
                             INSERT INTO exercises (question, choices, course_id)
                             VALUES (:question, :choices, :course_id)
                             """
             db.session.execute(text(add_course_sql), {"question": question, "choices": example_answer, "course_id": course_id})
             db.session.commit()
-        return redirect(f"/modifycourse?status=successfully_created")
+        return redirect(f"/modifycourse?id={course_id}")
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
