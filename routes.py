@@ -92,15 +92,24 @@ def coursetools():
 
 @app.route("/deletecourse")
 def deletecourse():
-    course_id = request.args.get("id")
     if session["role"] != "teacher":
-        return render_template("error.html", error="Ei oikeutta tähän toimintoon")
+        return render_template("error.html", error="Ei nähdä sivua")
+    course_id = request.args.get("id")
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
     sql = "DELETE FROM courses WHERE id =:course_id"
     db.session.execute(text(sql), {"course_id": course_id})
     db.session.commit()
     return redirect(f"/coursetools?status=deleted&name={course_name}")
+
+@app.route("/modifycourse")
+def modifycourse():
+    if session["role"] != "teacher":
+        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    course_id = request.args.get("id")
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id})
+    return render_template(f"/modifycourse.html", course_name=course_name)
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
