@@ -120,28 +120,28 @@ def coursesview():
     user_id = session["user_id"]
     print(user_id)
     own_courses_sql = """
-          SELECT courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
-          LEFT JOIN course_participants ON
-          courses.id = course_participants.course_id
-          LEFT JOIN course_teachers ON
-          courses.id = course_teachers.course_id
-          LEFT JOIN teacher_accounts ON
-          course_teachers.teacher_id = teacher_accounts.id
-          WHERE course_participants.student_id = :student_id
-          ORDER BY name ASC
-          """
+                      SELECT courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
+                      LEFT JOIN course_participants ON
+                      courses.id = course_participants.course_id
+                      LEFT JOIN course_teachers ON
+                      courses.id = course_teachers.course_id
+                      LEFT JOIN teacher_accounts ON
+                      course_teachers.teacher_id = teacher_accounts.id
+                      WHERE course_participants.student_id = :student_id
+                      ORDER BY name ASC
+                      """
     own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
     other_courses_sql = """
-                  SELECT courses.id, course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
-                  LEFT JOIN course_participants ON
-                  courses.id = course_participants.course_id
-                  LEFT JOIN course_teachers ON
-                  courses.id = course_teachers.course_id
-                  LEFT JOIN teacher_accounts ON
-                  course_teachers.teacher_id = teacher_accounts.id
-                  WHERE COALESCE(course_participants.student_id <> :student_id, TRUE)
-                  ORDER BY name ASC
-                  """
+                        SELECT courses.id, course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
+                        LEFT JOIN course_participants ON
+                        courses.id = course_participants.course_id
+                        LEFT JOIN course_teachers ON
+                        courses.id = course_teachers.course_id
+                        LEFT JOIN teacher_accounts ON
+                        course_teachers.teacher_id = teacher_accounts.id
+                        WHERE COALESCE(course_participants.student_id <> :student_id, TRUE)
+                        ORDER BY name ASC
+                        """
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
     return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
 
