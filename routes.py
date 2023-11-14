@@ -112,23 +112,43 @@ def modifycourse():
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
     course_exercises_sql = "SELECT question, choices FROM exercises WHERE course_id = :course_id"                     
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
-    return render_template(f"/modifycourse.html", course=course, course_exercises=course_exercises)
+    exercises = []
+    # for course in course_exercises:
+    #     print(course)
+    #     exercises.append((course[0], json.loads(course[1])))
+    # print(exercises)
+    return render_template(f"/modifycourse.html", course=course, exercises=exercises)
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
     if request.method == "POST":
-        course_id = request.form["course_id"]
-        question = request.form["exercise_name"]
         if request.form["exercise_type"] == "text_question":
+            course_id = request.form["course_id"]
+            question = request.form["question"]
             example_answer = request.form["example_answer"]
             example_answer = json.dumps(example_answer)
-            add_course_sql = """
-                            INSERT INTO exercises (question, choices, course_id)
-                            VALUES (:question, :choices, :course_id)
-                            """
-            db.session.execute(text(add_course_sql), {"question": question, "choices": example_answer, "course_id": course_id})
+            add_exercise_sql = """
+                               INSERT INTO exercises (question, choices, course_id)
+                               VALUES (:question, :choices, :course_id)
+                               """
+            db.session.execute(text(add_exercise_sql), {"question": question, "choices": example_answer, "course_id": course_id})
+            db.session.commit()
+        elif request.form["exercise_type"] == "multiple_choice":
+            question = request.form["question"]
+            choices = request.form["choices"]
+            correct_answers = request.form["correct_answers"]
+            course_id = request.form["course_id"]
+            choices_dict = {}
+            choices_dict["choices"] = choices
+            choices_dict["correct_answers"] = correct_answers
+            choices_dict = json.dumps(choices_dict)
+            add_exercise_sql = """
+                               INSERT INTO exercises (question, choices, course_id)
+                               VALUES (:question, :choices, :course_id)
+                               """
+            db.session.execute(text(add_exercise_sql), {"question": question, "choices": choices_dict, "course_id": course_id})
             db.session.commit()
         return redirect(f"/modifycourse?id={course_id}")
 
