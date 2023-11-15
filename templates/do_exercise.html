@@ -3,9 +3,10 @@
 
 {% block content %}
 <a href="/exercises_materials?id={{ course['id'] }}">Takaisin kurssin materiaaleihin</a>
-{% if request.args.get("status") == "wrong" %}
+<br>
+{% if not request.args.get("status") %}
 <b style="color: red">Vastaus väärin!</b>
-{% elif request.args.get("status") == "correct" %}
+{% elif request.args.get("status") %}
 <b style="color: green">Vastaus oikein!</b>
 {% endif %}
 <h2 style="margin-bottom: 0px">{{ course['name'] }} Tehtävä {{ exercise_num }}</h2>
