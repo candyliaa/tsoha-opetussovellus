@@ -224,7 +224,7 @@ def exercises_materials():
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
     exercises = []
     for exercise in course_exercises:
-        exercises.append((exercise[1], exercise[2]))
+        exercises.append((exercise[0], exercise[1], exercise[2]))
 
     return render_template(f"/exercises_materials.html", course=course, exercises=exercises, materials=materials)
 
