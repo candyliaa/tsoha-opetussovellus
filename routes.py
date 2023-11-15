@@ -117,6 +117,21 @@ def modifycourse():
         exercises.append((exercise[1], exercise[2]))
     return render_template(f"/modifycourse.html", course=course, exercises=exercises)
 
+@app.route("/addtextmaterial", methods=["POST"])
+def addtextmaterial():
+    if session["role"] != "teacher":
+        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    course_id = request.form["course_id"]
+    title = request.form["title"]
+    body = request.form["body"]
+    add_material_sql = """
+                       INSERT INTO text_materials (title, body, course_id)
+                       VALUES (:title, :body, :course_id)
+                       """
+    db.session.execute(text(add_material_sql), {"title": title, "body": body, "course_id": course_id})
+    db.session.commit()
+    return redirect(f"/modifycourse?id={course_id}&status=material_added")
+
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
     if session["role"] != "teacher":
