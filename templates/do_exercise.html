@@ -4,10 +4,12 @@
 {% block content %}
 <a href="/exercises_materials?id={{ course['id'] }}">Takaisin kurssin materiaaleihin</a>
 <br>
-{% if not request.args.get("status") %}
+{% if request.args.get("status") == "False" %}
 <b style="color: red">Vastaus väärin!</b>
-{% elif request.args.get("status") %}
+{% elif request.args.get("status") == "True" %}
 <b style="color: green">Vastaus oikein!</b>
+{% elif request.args.get("status") == "already_submitted" %}
+<b style="color: red">Olet jo yrittänyt tätä tehtävää!</b>
 {% endif %}
 <h2 style="margin-bottom: 0px">{{ course['name'] }} Tehtävä {{ exercise_num }}</h2>
 <br>
