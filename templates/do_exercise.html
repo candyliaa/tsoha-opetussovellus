@@ -6,12 +6,19 @@
 <h2 style="margin-bottom: 0px">{{ course['name'] }} Tehtävä {{ exercise_num }}</h2>
 <br>
 <h2 style="margin-top: 5px">{{ exercise[1] }}</h2>
-<form action="/submit_answer">
+<form action="/submit_answer" method="POST">
     {% if exercise[2] is not mapping %}
     <p>Kirjoita vastaus seuraavaan teksikenttään:</p>
     <textarea name="answer" rows="3" cols="50"></textarea>
     {% else %}
     <p>Valitse oikea vastaus seuraavista vaihtoehdoista:</p>
+    <ul style="list-style-type: none">
+        <li> <input type="radio" name="choice" value="1" required> {{ exercise[2]["choices"][0] }}</li>
+        <li> <input type="radio" name="choice" value="2"> {{ exercise[2]["choices"][1] }}</li>
+        <li> <input type="radio" name="choice" value="3"> {{ exercise[2]["choices"][2] }}</li>
+        <li> <input type="radio" name="choice" value="4"> {{ exercise[2]["choices"][3] }}</li>
+    </ul>
     {% endif %}
+    <input type="submit" value="Lähetä vastaus">
 </form>
 {% endblock %}
