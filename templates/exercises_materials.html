@@ -1,6 +1,32 @@
 {% extends "layout.html" %}
-{% block title %}Tehtävien teko{% endblock %}
+{% block title %}Tehtävien teko ja materiaalit{% endblock %}
 
 {% block content %}
-<h2>Valittu kurssi: </h2>
+<h2>Valittu kurssi: {{ course['name'] }}</h2>
+<hr>
+<h2>Tekstimateriaalit</h2>
+<button onclick="openDiv('list-materials')">Listaa tekstimateriaalit</button>
+<div id="list-materials" style="display: none">
+    <div id="list-materials" style="display: none">
+        {% for i in range(materials|length) %}
+        <b>{{ i + 1 }}. materiaali</b>
+        <br>
+        {{ materials[i][1] }}
+        <br>
+        <textarea style="resize: none" name="body" rows="5" cols="50" readonly>{{ materials[i][2] }}</textarea>
+        <br>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function openDiv(divID) {
+        const div = document.getElementById(divID);
+        if (div.style.display === "none") {
+            div.style.display = "block";
+        } else {
+            div.style.display = "none";
+        }
+    }
+</script>
 {% endblock %}
