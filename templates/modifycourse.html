@@ -14,6 +14,18 @@
 <p>Tekstimateriaali lisätty onnistuneesti!</p>
 {% endif %}
 
+<button onclick="openDiv('list-materials')">Listaa tekstimateriaalit</button>
+<div id="list-materials" style="display: none">
+    {% for i in range(materials|length) %}
+    <b>{{ i + 1 }}. materiaali</b>
+    <br>
+    {{ materials[i][1] }}
+    <br>
+    <textarea style="resize: none" name="body" rows="5" cols="50" readonly>{{ materials[i][2] }}</textarea>
+    <br>
+    {% endfor %}
+</div>
+
 <button onclick="openDiv('materialform')">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
     <form action="/addtextmaterial", method="POST">
