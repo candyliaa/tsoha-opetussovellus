@@ -8,17 +8,19 @@
 {% else %}
 <h3>Tehtäviä: {{ course_exercises|length }}</h3>
 {% endif %}
-<button onclick="openForm()">Lisää tehtävä </button>
+<a href="/coursetools">Takaisin kurssinäkymään</a>
+<br>
 <button onclick="listExercises()">Listaa tehtävät</button>
 <div id="list-exercises" style="display: none">
     <h3>Tekstitehtävät</h3>
 </div>
+<button onclick="openForm()">Lisää tehtävä </button>
 <div id="exerciseform" style="display: none">
     <br>
     <button onclick="openTextExercise()">Tekstitehtävä</button>
     <button onclick="openMultipleChoiceExercise()">Monivalintatehtävä</button>
 </div>
-<div style="display: none">
+<div id="textform" style="display: none">
     <form action="/exercisecreated" id="textform" method="POST">
         <input type="hidden" name="course_id" value="{{ course['id'] }}">
         <input type="hidden" name="exercise_type" value="text_question">
@@ -34,25 +36,22 @@
     </form>
 </div>
 <div id="multiplechoiceform" style="display: none">
-    <form onsubmit="submit()">
+    <form action="/exercisecreated" id="multiple_choice" method="POST">
         <input type="hidden" name="course_id" value="{{ course['id'] }}">
+        <input type="hidden" name="exercise_type" value="multiple_choice">
         <label for="question">Tehtävän kysymys:</label>
         <br>
         <input name="question" type="text" minlength="1" required>
         <br>
         Valinnat:
         <br>
-        <ul id="list-choices">
-            <li><input type="checkbox" class="correct_answers" checked="true"><input name="choices[]" type="text" class="choices" required></li>
-            <li><input type="checkbox" class="correct_answers"><input name="choices[]" type="text" class="choices" required ></li>
+        <ul>
+            <li><input type="radio" name="correct_answer" required></input><input name="choice1" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" required><input name="choice2" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" required><input name="choice3" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" required><input name="choice4" type="text" minlength="1" required></li>
         </ul>
-        <template id="choice-input-template">
-            <li><input type="checkbox" class="correct_answers"><input type="text" name="choices[]" required></li>
-        </template>
-        <br>
-        <button onclick="addChoice()">Lisää valinta</button>
         <input type="submit" value="Luo tehtävä">
-    </form>
 </div>
 <br style="line-height: 2">
 <a href="/deletecourse?id={{course['id']}}" style="color: red">Poista kurssi</a>
@@ -93,26 +92,6 @@
         if (textForm.style.display === "block") {
             textForm.style.display = "none"
         }
-    }
-
-    function addChoice() {
-        const ul = document.getElementById("list-choices");
-        const newChoice = document.getElementById("choice-input-template").content.cloneNode(true);
-        ul.appendChild(newChoice);
-    }
-
-    function submit() {
-        const question = document.getElementsByName("question").value;
-        const choices = Array.from(document.getElementsByClassName("choices")).map(i => i.value);
-        const correctAnswers = Array.from(document.getElementsByClassName("correct_answers")).map(i => i.checked);
-        const course_id = document.getElementsByName("course_id").value;
-        const formData = new FormData();
-        formData.append("question", question);
-        formData.append("choices", choices);
-        formData.append("correct_answers", correctAnswers);
-        formData.append("exercise_type", "multiple_choice");
-        formData.append("course_id", course_id)
-        fetch("/exercisecreated", { method: "POST", body: formData });
     }
 
     function listExercises() {
