@@ -14,15 +14,25 @@
 <button onclick="listExercises()">Listaa tehtävät</button>
 {% endif %}
 <div id="list-exercises" style="display: none">
-    <h3>tehtävät</h3>
+    <h3>Tehtävät</h3>
     {% for i in range(exercises|length) %}
-    {% if exercises[i][1] is not mapping %}
     <b>{{ i + 1 }}. tehtävä</b>
     <br>
+    {{exercises[i][0]}}
+    <br>
+    {% if exercises[i][1] is not mapping %}
     <b>Mallivastaus</b>
     <br>
     <textarea name="example_answer" rows="3" cols="50">{{ exercises[i][1] }}</textarea>
     <br style="line-height: 3">
+    {% else %}
+    <b>Vaihtoehdot</b>
+    <ul>
+        <li>{{ exercises[i][1]["choices"][0] }}</li>
+        <li>{{ exercises[i][1]["choices"][1] }}</li>
+        <li>{{ exercises[i][1]["choices"][2] }}</li>
+        <li>{{ exercises[i][1]["choices"][3] }}</li>
+    </ul>
     {% endif %}
     {% endfor %}
 </div>
