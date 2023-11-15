@@ -3,6 +3,7 @@
 
 {% block content %}
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
+<a href="/coursetools">Takaisin kurssinäkymään</a>
 <h3>Tekstimateriaalit</h3>
 <button onclick="addMaterial()">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
@@ -23,7 +24,6 @@
 {% else %}
 <h3>Tehtäviä: {{ exercises|length }}</h3>
 {% endif %}
-<a href="/coursetools">Takaisin kurssinäkymään</a>
 <br>
 {% if exercises|length != 0 %}
 <button onclick="listExercises()">Listaa tehtävät</button>
