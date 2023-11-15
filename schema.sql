@@ -17,3 +17,5 @@ CREATE TABLE course_participants (course_id INTEGER REFERENCES courses(id) ON DE
 CREATE TABLE exercises (id SERIAL PRIMARY KEY, question TEXT, choices JSON, course_id INTEGER REFERENCES courses(id));
 
 CREATE TABLE text_materials (id SERIAL PRIMARY KEY, title TEXT, body TEXT, course_id INTEGER REFERENCES courses(id));
+
+CREATE TABLE exercise_answers (id SERIAL PRIMARY KEY, answer TEXT, student_id INTEGER REFERENCES student_accounts(id), course_id INTEGER REFERENCES courses(id), exercise_id INTEGER REFERENCES exercises(id))
