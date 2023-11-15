@@ -209,6 +209,25 @@ def coursesview():
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
     return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
 
+@app.route("/exercises_materials", methods=["POST"])
+def exercises_materials():
+    if session["role"] != "student":
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    course_id = request.args["id"]
+    course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
+    course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
+
+    materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
+    materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
+    
+    course_exercises_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id ORDER BY id"                     
+    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
+    exercises = []
+    for exercise in course_exercises:
+        exercises.append((exercise[1], exercise[2]))
+
+    return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials)
+
 @app.route("/leavecourse")
 def leavecourse():
     course_id = request.args.get("id")
