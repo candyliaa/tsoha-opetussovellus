@@ -28,10 +28,30 @@
     {% else %}
     <b>Vaihtoehdot</b>
     <ul>
-        <li>{{ exercises[i][1]["choices"][0] }}</li>
-        <li>{{ exercises[i][1]["choices"][1] }}</li>
-        <li>{{ exercises[i][1]["choices"][2] }}</li>
-        <li>{{ exercises[i][1]["choices"][3] }}</li>
+        <li> 
+            {{ exercises[i][1]["choices"][0] }}
+            {% if exercises[i][1]["correct_answer"] == "1" %}
+            ✔
+            {% endif %}
+        </li> 
+        <li>
+            {{ exercises[i][1]["choices"][1] }}
+            {% if exercises[i][1]["correct_answer"] == "2" %}
+            ✔
+            {% endif %}
+        </li>
+        <li>
+            {{ exercises[i][1]["choices"][2] }}
+            {% if exercises[i][1]["correct_answer"] == "3" %}
+            ✔
+            {% endif %}
+        </li>
+        <li>
+            {{ exercises[i][1]["choices"][3] }}
+            {% if exercises[i][1]["correct_answer"] == "4" %}
+            ✔
+            {% endif %}
+        </li>
     </ul>
     {% endif %}
     {% endfor %}
