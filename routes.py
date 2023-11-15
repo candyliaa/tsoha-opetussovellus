@@ -108,15 +108,13 @@ def modifycourse():
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
     course_id = request.args.get("id")
-    course_sql = "SELECT id, name, credits, exercises FROM courses WHERE id = :course_id"
+    course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
     course_exercises_sql = "SELECT question, choices FROM exercises WHERE course_id = :course_id"                     
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
     exercises = []
-    # for course in course_exercises:
-    #     print(course)
-    #     exercises.append((course[0], json.loads(course[1])))
-    # print(exercises)
+    for exercise in course_exercises:
+        exercises.append((exercise[0], exercise[1]))
     return render_template(f"/modifycourse.html", course=course, exercises=exercises)
 
 @app.route("/exercisecreated", methods=["POST"])
