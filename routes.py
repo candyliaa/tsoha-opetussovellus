@@ -137,12 +137,18 @@ def exercisecreated():
             db.session.commit()
         elif request.form["exercise_type"] == "multiple_choice":
             question = request.form["question"]
-            choices = request.form["choices"]
-            correct_answers = request.form["correct_answers"]
             course_id = request.form["course_id"]
+
+            choice1 = request.form["choice1"]
+            choice2 = request.form["choice2"]
+            choice3 = request.form["choice3"]
+            choice4 = request.form["choice4"]
+            choices = [choice1, choice2, choice3, choice4]
+            correct_answer = request.form["correct_answer"]
+            
             choices_dict = {}
             choices_dict["choices"] = choices
-            choices_dict["correct_answers"] = correct_answers
+            choices_dict["correct_answer"] = correct_answer
             choices_dict = json.dumps(choices_dict)
             add_exercise_sql = """
                                INSERT INTO exercises (question, choices, course_id)
