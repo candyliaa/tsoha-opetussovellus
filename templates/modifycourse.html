@@ -5,16 +5,19 @@
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
 <a href="/coursetools">Takaisin kurssinäkymään</a>
 <h3>Tekstimateriaalit</h3>
+{% if request.args.get("status") == "material_added" %}
+<p>Tekstimateriaali lisätty onnistuneesti!</p>
 <button onclick="openDiv('materialform')">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
     <form action="/addtextmaterial", method="POST">
+        <input type="hidden" name="course_id" value="{{ course['id'] }}">
         <label for="title">Materiaalin otsikko</label>
         <br>
         <input name="title" type="text" required>
         <br>
-        <label for="material">Materiaali</label>
+        <label for="body">Materiaali</label>
         <br>
-        <textarea name="material" rows="5" cols="50" required></textarea>
+        <textarea name="body" rows="5" cols="50" required></textarea>
         <br>
         <input type="submit" value="Lisää materiaali">
     </form>
@@ -24,7 +27,6 @@
 {% else %}
 <h3>Tehtäviä: {{ exercises|length }}</h3>
 {% endif %}
-<br>
 {% if exercises|length != 0 %}
 <button onclick="openDiv('list-exercises')">Listaa tehtävät</button>
 {% endif %}
