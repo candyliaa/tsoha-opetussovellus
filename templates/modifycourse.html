@@ -5,7 +5,11 @@
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
 <a href="/coursetools">Takaisin kurssinäkymään</a>
 
-<h3>Tekstimateriaalit</h3>
+{% if materials|length == 0 %}
+<h3>Kurssilla ei ole tekstimateriaaleja.</h3>
+{% else %}
+<h3>Tekstimateriaaleja: {{ materials|length }}</h3>
+{% endif %}
 {% if request.args.get("status") == "material_added" %}
 <p>Tekstimateriaali lisätty onnistuneesti!</p>
 {% endif %}
