@@ -2,7 +2,6 @@
 {% block title %}Kurssinäkymä{% endblock %}
 
 {% block content %}
-
 <h2>Omat kurssit</h2>
 {% if request.args.get("status") == "left" %}
 <p>Lähdit kurssilta {{ request.args.get("name") }}.</p>
