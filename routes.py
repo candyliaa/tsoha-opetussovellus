@@ -209,7 +209,7 @@ def coursesview():
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
     return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
 
-@app.route("/exercises_materials", methods=["POST"])
+@app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -226,7 +226,7 @@ def exercises_materials():
     for exercise in course_exercises:
         exercises.append((exercise[1], exercise[2]))
 
-    return render_template(f"/exercises_materials.html?id={course_id}", course=course, exercises=exercises, materials=materials)
+    return render_template(f"/exercises_materials.html", course=course, exercises=exercises, materials=materials)
 
 @app.route("/leavecourse")
 def leavecourse():
