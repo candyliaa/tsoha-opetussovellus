@@ -256,24 +256,24 @@ def submit_answer():
 
     add_exercise_sql = """
                        INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
-                       VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
+                       SELECT :answer, :student_id, :course_id, :exercise_id, :correct
+                       WHERE NOT EXISTS (SELECT student_id, course_id, exercise_id FROM exercise_answers
+                       WHERE student_id = :student_id AND course_id = :course_id AND exercise_id = :exercise_id)
                        """
     if exercise_type == "text_exercise":
         if answer == exercise[1]:
-            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": True})
-            status = "correct"
+            status = True
         else:
-            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": False})
-            status = "wrong"
-        db.session.commit()
-    else:
+            status = False
+    elif exercise_type == "multiple_choice":
         if answer == exercise[1]["correct_answer"]:
-            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": True})
-            status = "correct"
+            status = True
         else:
-            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": False})
-            status = "wrong"
-        db.session.commit()
+            status = False
+    result = db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": status})
+    db.session.commit()
+    if not result:
+        status = "already_submitted"
     return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}")
 
 @app.route("/leavecourse")
