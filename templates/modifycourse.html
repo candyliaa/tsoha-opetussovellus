@@ -3,16 +3,28 @@
 
 {% block content %}
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
-{% if course_exercises|length == 0 %}
+{% if exercises|length == 0 %}
 <h3>Kurssilla ei ole tehtäviä.</h3>
 {% else %}
-<h3>Tehtäviä: {{ course_exercises|length }}</h3>
+<h3>Tehtäviä: {{ exercises|length }}</h3>
 {% endif %}
 <a href="/coursetools">Takaisin kurssinäkymään</a>
 <br>
+{% if exercises|length != 0 %}
 <button onclick="listExercises()">Listaa tehtävät</button>
+{% endif %}
 <div id="list-exercises" style="display: none">
-    <h3>Tekstitehtävät</h3>
+    <h3>tehtävät</h3>
+    {% for i in range(exercises|length) %}
+    {% if exercises[i][1] is not mapping %}
+    <b>{{ i + 1 }}. tehtävä</b>
+    <br>
+    <b>Mallivastaus</b>
+    <br>
+    <textarea name="example_answer" rows="3" cols="50">{{ exercises[i][1] }}</textarea>
+    <br style="line-height: 3">
+    {% endif %}
+    {% endfor %}
 </div>
 <button onclick="openForm()">Lisää tehtävä </button>
 <div id="exerciseform" style="display: none">
