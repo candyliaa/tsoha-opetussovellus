@@ -228,7 +228,7 @@ def exercises_materials():
 
     return render_template(f"/exercises_materials.html", course=course, exercises=exercises, materials=materials)
 
-@app.route("/do_exercise", methods=["POST"])
+@app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -244,7 +244,25 @@ def do_exercise():
 def submit_answer():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    
+    answer = request.form["answer"]
+    student_id = session["user_id"]
+    course_id = request.form["course_id"]
+    exercise_id = request.form["exercise_id"]
+    exercise_type = request.form["exercise_type"]
+
+    exercise_sql = "SELECT id, choices, course_id FROM exercises WHERE id = :exercise_id"
+    exercise = db.session.execute(text(exercise_sql), {"exercise_id": exercise_id}).fetchone()
+
+    if exercise_type == "text_answer":
+        add_exercise_sql = """
+                           INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
+                           VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
+                           """
+        if answer == exercise[1]:
+            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": True})
+        else:
+            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": False})
+        db.session.commit()
 
 @app.route("/leavecourse")
 def leavecourse():
