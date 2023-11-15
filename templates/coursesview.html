@@ -2,6 +2,7 @@
 {% block title %}Kurssinäkymä{% endblock %}
 
 {% block content %}
+
 <h2>Omat kurssit</h2>
 {% if request.args.get("status") == "left" %}
 <p>Lähdit kurssilta {{ request.args.get("name") }}.</p>
@@ -30,6 +31,7 @@
             <td>{{ course["teacher_names"] }}</td>
             <td><a href="/leavecourse?id={{course['id']}}" style="color: red">Poistu kurssilta</a></td>
             <td><a href="/exercises?id={{course['id']}}">Tee tehtäviä</a></td>
+            <td>Tehtäviä tehty: / </td>
         </tr>
     {% endfor %}
     </tbody>
