@@ -33,7 +33,11 @@
             {% if not course['id'] in total_exercises_dict.keys() %}
             <td>Kurssilla ei ole tehtäviä.</td>
             {% else %}
+            {% if exercises_done_dict[course['id']] is not defined %}
+            <td>Tehtäviä tehty: 0 / {{ total_exercises_dict[course['id']] }}</td>
+            {% else %}
             <td>Tehtäviä tehty: {{ exercises_done_dict[course['id']] }} / {{ total_exercises_dict[course['id']] }}</td>
+            {% endif %}
             {% endif %}
         </tr>
     {% endfor %}
