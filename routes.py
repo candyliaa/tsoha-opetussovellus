@@ -309,10 +309,17 @@ def leavecourse():
     course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
     leave_course_sql = """
                        DELETE FROM course_participants
-                       WHERE student_id = :student_id AND
-                       course_id = :course_id
+                       WHERE student_id = :student_id
+                       AND course_id = :course_id
                        """
+    delete_submissions_sql = """
+                             DELETE FROM exercise_answers
+                             WHERE student_id = :student_id
+                             AND course_id = :course_id
+                             """
     db.session.execute(text(leave_course_sql), {"student_id": student_id, "course_id": course_id})
+    db.session.commit()
+    db.session.execute(text(delete_submissions_sql), {"student_id": student_id, "course_id": course_id})
     db.session.commit()
     return redirect(f"/coursesview?status=left&name={course_name}")
 
