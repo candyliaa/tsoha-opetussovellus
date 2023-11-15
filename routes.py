@@ -110,12 +110,16 @@ def modifycourse():
     course_id = request.args.get("id")
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
+
+    materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
+    materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
+
     course_exercises_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id ORDER BY id"                     
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
     exercises = []
     for exercise in course_exercises:
         exercises.append((exercise[1], exercise[2]))
-    return render_template(f"/modifycourse.html", course=course, exercises=exercises)
+    return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials)
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
