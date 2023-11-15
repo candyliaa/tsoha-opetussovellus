@@ -15,3 +15,5 @@ CREATE TABLE course_teachers (course_id INTEGER REFERENCES courses(id) ON DELETE
 CREATE TABLE course_participants (course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE, student_id INTEGER REFERENCES student_accounts(id));
 
 CREATE TABLE exercises (id SERIAL PRIMARY KEY, question TEXT, choices JSON, course_id INTEGER REFERENCES courses(id));
+
+CREATE TABLE text_materials (id SERIAL PRIMARY KEY, title TEXT, body TEXT, course_id INTEGER REFERENCES courses(id));
