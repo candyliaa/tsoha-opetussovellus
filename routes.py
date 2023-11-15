@@ -228,7 +228,7 @@ def exercises_materials():
 
     return render_template(f"/exercises_materials.html", course=course, exercises=exercises, materials=materials)
 
-@app.route("/do_exercise", methods=["GET"])
+@app.route("/do_exercise", methods=["POST"])
 def do_exercise():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -239,6 +239,12 @@ def do_exercise():
     exercise_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id AND id = :id"
     exercise = db.session.execute(text(exercise_sql), {"course_id": course_id, "id": exercise_id}).fetchone()
     return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course)
+
+@app.route("/submit_answer", methods=["GET"])
+def submit_answer():
+    if session["role"] != "student":
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    
 
 @app.route("/leavecourse")
 def leavecourse():
