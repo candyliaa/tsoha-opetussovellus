@@ -203,6 +203,15 @@ def coursesview():
     exercises_done_dict = {}
     for course in exercises_done:
         exercises_done_dict[course[0]] = course[1]
+    total_exercises_sql = """
+                          SELECT course_id, COUNT(id)
+                          FROM exercises
+                          GROUP BY course_id
+                          """
+    total_exercises = db.session.execute(text(total_exercises_sql)).fetchall()
+    total_exercises_dict = {}
+    for course in total_exercises:
+        total_exercises_dict[course[0]] = course[1]
     own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
     other_courses_sql = """
                         SELECT courses.id, course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
@@ -216,7 +225,7 @@ def coursesview():
                         ORDER BY name ASC
                         """
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
-    return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses, exercises_done_dict=exercises_done_dict)
+    return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses, exercises_done_dict=exercises_done_dict, total_exercises_dict=total_exercises_dict)
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
