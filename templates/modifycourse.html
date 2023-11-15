@@ -3,6 +3,21 @@
 
 {% block content %}
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
+<h3>Tekstimateriaalit</h3>
+<button onclick="addMaterial()">Lisää tekstimateriaalia</button>
+<div id="materialform" style="display: none">
+    <form action="/addtextmaterial", method="POST">
+        <label for="title">Materiaalin otsikko</label>
+        <br>
+        <input name="title" type="text" required>
+        <br>
+        <label for="material">Materiaali</label>
+        <br>
+        <textarea name="material" rows="5" cols="50" required></textarea>
+        <br>
+        <input type="submit" value="Lisää materiaali">
+    </form>
+</div>
 {% if exercises|length == 0 %}
 <h3>Kurssilla ei ole tehtäviä.</h3>
 {% else %}
@@ -102,6 +117,15 @@
 <h2>Tilastoja:</h2>
 <!--Scripts for the buttons on this page-->
 <script>
+    function addMaterial() {
+        const materialForm = document.getElementById("materialform");
+        if (materialForm.style.display === "none") {
+            materialForm.style.display = "block";
+        } else {
+            materialForm.stlye.display = "none";
+        }
+    }
+
     function openForm() {
         const form = document.getElementById("exerciseform");
         if (form.style.display === "none") {
@@ -120,7 +144,7 @@
         }
         var multipleChoiceForm = document.getElementById("multiplechoiceform")
         if (multipleChoiceForm.style.display === "block") {
-            multipleChoiceForm.style.display = "none"
+            multipleChoiceForm.style.display = "none";
         }
     }
 
@@ -133,7 +157,7 @@
         }
         var textForm = document.getElementById("textform")
         if (textForm.style.display === "block") {
-            textForm.style.display = "none"
+            textForm.style.display = "none";
         }
     }
 
@@ -142,7 +166,7 @@
         if (exerciseList.style.display === "none") {
             exerciseList.style.display = "block";
         } else {
-            exerciseList.style.display = "none"
+            exerciseList.style.display = "none";
         }
     }
 </script>
