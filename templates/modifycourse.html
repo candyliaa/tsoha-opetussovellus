@@ -4,10 +4,12 @@
 {% block content %}
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
 <a href="/coursetools">Takaisin kurssinäkymään</a>
+
 <h3>Tekstimateriaalit</h3>
 {% if request.args.get("status") == "material_added" %}
 <p>Tekstimateriaali lisätty onnistuneesti!</p>
 {% endif %}
+
 <button onclick="openDiv('materialform')">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
     <form action="/addtextmaterial", method="POST">
@@ -23,11 +25,13 @@
         <input type="submit" value="Lisää materiaali">
     </form>
 </div>
+
 {% if exercises|length == 0 %}
 <h3>Kurssilla ei ole tehtäviä.</h3>
 {% else %}
 <h3>Tehtäviä: {{ exercises|length }}</h3>
 {% endif %}
+
 {% if exercises|length != 0 %}
 {% if request.args.get("status") == "exercise_added" %}
 <p>Tehtävä lisätty onnistuneesti!</p>
@@ -77,6 +81,7 @@
     {% endif %}
     {% endfor %}
 </div>
+
 <button onclick="openDiv('exerciseform')">Lisää tehtävä </button>
 <div id="exerciseform" style="display: none">
     <br>
