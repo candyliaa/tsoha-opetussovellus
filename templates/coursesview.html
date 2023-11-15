@@ -30,7 +30,7 @@
             <td>{{ course["credits"] }}</td>
             <td>{{ course["teacher_names"] }}</td>
             <td><a href="/leavecourse?id={{course['id']}}" style="color: red">Poistu kurssilta</a></td>
-            <td><a href="/exercises?id={{course['id']}}">Tee tehtäviä</a></td>
+            <td><a href="/exercises_materials?id={{course['id']}}">Tehtävät ja materiaalit</a></td>
             <td>Tehtäviä tehty: / </td>
         </tr>
     {% endfor %}
