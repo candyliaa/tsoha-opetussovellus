@@ -22,7 +22,18 @@
 </div>
 {% endif %}
 <hr>
-
+<h2>Tehtävät</h2>
+{% if exercises|length == 0 %}
+<b>Kurssilla ei ole tehtäviä.</b>
+{% else %}
+<b>Tehtävälista:</b>
+{% for i in range(exercises|length) %}
+{% if i % 5 == 0 %}
+<br>
+{% endif %}
+<a href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i][0] }}">T{{ i + 1 }}</a>
+{% endfor %}
+{% endif %}
 <script>
     function openDiv(divID) {
         const div = document.getElementById(divID);
