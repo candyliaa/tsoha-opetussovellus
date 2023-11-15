@@ -31,7 +31,7 @@
 {% if i % 5 == 0 %}
 <br>
 {% endif %}
-<a href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i][0] }}">T{{ i + 1 }}</a>
+<a href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i][0] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
 {% endfor %}
 {% endif %}
 <script>
