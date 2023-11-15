@@ -5,7 +5,7 @@
 <h2>Valittu kurssi: {{ course["name"] }} ({{ course["credits"] }} op)</h2>
 <a href="/coursetools">Takaisin kurssinäkymään</a>
 <h3>Tekstimateriaalit</h3>
-<button onclick="addMaterial()">Lisää tekstimateriaalia</button>
+<button onclick="openDiv('materialform')">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
     <form action="/addtextmaterial", method="POST">
         <label for="title">Materiaalin otsikko</label>
@@ -26,7 +26,7 @@
 {% endif %}
 <br>
 {% if exercises|length != 0 %}
-<button onclick="listExercises()">Listaa tehtävät</button>
+<button onclick="openDiv('list-exercises')">Listaa tehtävät</button>
 {% endif %}
 <div id="list-exercises" style="display: none">
     <h3>Tehtävät</h3>
@@ -71,7 +71,7 @@
     {% endif %}
     {% endfor %}
 </div>
-<button onclick="openForm()">Lisää tehtävä </button>
+<button onclick="openDiv('exerciseform')">Lisää tehtävä </button>
 <div id="exerciseform" style="display: none">
     <br>
     <button onclick="openTextExercise()">Tekstitehtävä</button>
@@ -117,57 +117,40 @@
 <h2>Tilastoja:</h2>
 <!--Scripts for the buttons on this page-->
 <script>
-    function addMaterial() {
-        const materialForm = document.getElementById("materialform");
-        if (materialForm.style.display === "none") {
-            materialForm.style.display = "block";
+    function openDiv(divID) {
+        const div = document.getElementById(divID);
+        if (div.style.display === "none") {
+            div.style.display = "block";
         } else {
-            materialForm.style.display = "none";
-        }
-    }
-
-    function openForm() {
-        const form = document.getElementById("exerciseform");
-        if (form.style.display === "none") {
-            form.style.display = "block";
-        } else {
-            form.style.display = "none";
+            div.style.display = "none";
         }
     }
 
     function openTextExercise() {
-        var textForm = document.getElementById("textform");
+        const textForm = document.getElementById("textform");
         if (textForm.style.display === "none") {
             textForm.style.display = "block";
         } else {
             textForm.style.display = "none";
         }
-        var multipleChoiceForm = document.getElementById("multiplechoiceform")
+        const multipleChoiceForm = document.getElementById("multiplechoiceform")
         if (multipleChoiceForm.style.display === "block") {
             multipleChoiceForm.style.display = "none";
         }
     }
 
     function openMultipleChoiceExercise() {
-        var multipleChoiceForm = document.getElementById("multiplechoiceform");
+        const multipleChoiceForm = document.getElementById("multiplechoiceform");
         if (multipleChoiceForm.style.display === "none") {
             multipleChoiceForm.style.display = "block";
         } else {
             multipleChoiceForm.style.display = "none";
         }
-        var textForm = document.getElementById("textform")
+        const textForm = document.getElementById("textform")
         if (textForm.style.display === "block") {
             textForm.style.display = "none";
         }
     }
 
-    function listExercises() {
-        const exerciseList = document.getElementById("list-exercises")
-        if (exerciseList.style.display === "none") {
-            exerciseList.style.display = "block";
-        } else {
-            exerciseList.style.display = "none";
-        }
-    }
 </script>
 {% endblock %}
