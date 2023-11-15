@@ -3,26 +3,32 @@
 
 {% block content %}
 <a href="/exercises_materials?id={{ course['id'] }}">Takaisin kurssin materiaaleihin</a>
+{% if request.args.get("status") == "wrong" %}
+<b style="color: red">Vastaus väärin!</b>
+{% if request.args.get("status") == "correct" %}
+<b style="color: green">Vastaus oikein!</b>
 <h2 style="margin-bottom: 0px">{{ course['name'] }} Tehtävä {{ exercise_num }}</h2>
 <br>
 <h2 style="margin-top: 5px">{{ exercise[1] }}</h2>
 <form action="/submit_answer" method="POST">
     <input type="hidden" name="course_id" value="{{ course['id'] }}">
     <input type="hidden" name="exercise_id" value="{{ exercise['id'] }}">
-    <input type="hidden" name="exercise_type" value="text_exercise">
+    <input type="hidden" name="exercise_num" value="{{ exercise_num }}">
     {% if exercise[2] is not mapping %}
+    <input type="hidden" name="exercise_type" value="text_exercise">
     <p>Kirjoita vastaus seuraavaan teksikenttään:</p>
-    <textarea name="answer" rows="3" cols="50"></textarea>
+    <textarea name="answer" rows="3" cols="50" required></textarea>
     {% else %}
+    <input type="hidden" name="exercise_type" value="multiple_choice">
     <p>Valitse oikea vastaus seuraavista vaihtoehdoista:</p>
     <ul style="list-style-type: none">
-        <input type="hidden" name="exercise_type" value="multiple_choice">
         <li> <input type="radio" name="answer" value="1" required> {{ exercise[2]["choices"][0] }}</li>
         <li> <input type="radio" name="answer" value="2"> {{ exercise[2]["choices"][1] }}</li>
         <li> <input type="radio" name="answer" value="3"> {{ exercise[2]["choices"][2] }}</li>
         <li> <input type="radio" name="answer" value="4"> {{ exercise[2]["choices"][3] }}</li>
     </ul>
     {% endif %}
+    <br>
     <input type="submit" value="Lähetä vastaus">
 </form>
 {% endblock %}
