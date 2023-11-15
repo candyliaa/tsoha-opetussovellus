@@ -182,7 +182,6 @@ def coursesview():
     if session["role"] != "student":
         return render_template("error.html", error="Et ole opiskelija")
     user_id = session["user_id"]
-    print(user_id)
     own_courses_sql = """
                       SELECT courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
                       LEFT JOIN course_participants ON
@@ -194,6 +193,16 @@ def coursesview():
                       WHERE course_participants.student_id = :student_id
                       ORDER BY name ASC
                       """
+    exercises_done_sql = """
+                         SELECT course_id, COUNT(id) 
+                         FROM exercise_answers
+                         WHERE student_id = :student_id
+                         GROUP BY course_id
+                         """
+    exercises_done = db.session.execute(text(exercises_done_sql), {"student_id": user_id}).fetchall()
+    exercises_done_dict = {}
+    for course in exercises_done:
+        exercises_done_dict[course[0]] = course[1]
     own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
     other_courses_sql = """
                         SELECT courses.id, course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
@@ -207,7 +216,7 @@ def coursesview():
                         ORDER BY name ASC
                         """
     other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
-    return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses)
+    return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses, exercises_done_dict=exercises_done_dict)
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
