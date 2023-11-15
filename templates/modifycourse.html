@@ -7,6 +7,7 @@
 <h3>Tekstimateriaalit</h3>
 {% if request.args.get("status") == "material_added" %}
 <p>Tekstimateriaali lisätty onnistuneesti!</p>
+{% endif %}
 <button onclick="openDiv('materialform')">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
     <form action="/addtextmaterial", method="POST">
@@ -28,6 +29,9 @@
 <h3>Tehtäviä: {{ exercises|length }}</h3>
 {% endif %}
 {% if exercises|length != 0 %}
+{% if request.args.get("status") == "exercise_added" %}
+<p>Tehtävä lisätty onnistuneesti!</p>
+{% endif %}
 <button onclick="openDiv('list-exercises')">Listaa tehtävät</button>
 {% endif %}
 <div id="list-exercises" style="display: none">

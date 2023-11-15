@@ -169,7 +169,7 @@ def exercisecreated():
                                """
             db.session.execute(text(add_exercise_sql), {"question": question, "choices": choices_dict, "course_id": course_id})
             db.session.commit()
-        return redirect(f"/modifycourse?id={course_id}")
+        return redirect(f"/modifycourse?id={course_id}&status=exercise_added")
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
