@@ -226,7 +226,7 @@ def exercises_materials():
     for exercise in course_exercises:
         exercises.append((exercise[1], exercise[2]))
 
-    return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials)
+    return render_template(f"/exercises_materials.html?id={course_id}", course=course, exercises=exercises, materials=materials)
 
 @app.route("/leavecourse")
 def leavecourse():
