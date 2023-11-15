@@ -30,7 +30,11 @@
             <td>{{ course["teacher_names"] }}</td>
             <td><a href="/leavecourse?id={{course['id']}}" style="color: red">Poistu kurssilta</a></td>
             <td><a href="/exercises_materials?id={{course['id']}}">Tehtävät ja materiaalit</a></td>
-            <td>Tehtäviä tehty: / </td>
+            {% if not course['id'] in total_exercises_dict.keys() %}
+            <td>Kurssilla ei ole tehtäviä.</td>
+            {% else %}
+            <td>Tehtäviä tehty: {{ exercises_done_dict[course['id']] }} / {{ total_exercises_dict[course['id']] }}</td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>
