@@ -240,7 +240,7 @@ def do_exercise():
     exercise = db.session.execute(text(exercise_sql), {"course_id": course_id, "id": exercise_id}).fetchone()
     return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course)
 
-@app.route("/submit_answer", methods=["GET"])
+@app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -249,20 +249,32 @@ def submit_answer():
     course_id = request.form["course_id"]
     exercise_id = request.form["exercise_id"]
     exercise_type = request.form["exercise_type"]
+    exercise_num = request.form["exercise_num"]
 
     exercise_sql = "SELECT id, choices, course_id FROM exercises WHERE id = :exercise_id"
     exercise = db.session.execute(text(exercise_sql), {"exercise_id": exercise_id}).fetchone()
 
-    if exercise_type == "text_answer":
-        add_exercise_sql = """
-                           INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
-                           VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
-                           """
+    add_exercise_sql = """
+                       INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
+                       VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
+                       """
+    if exercise_type == "text_exercise":
         if answer == exercise[1]:
             db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": True})
+            status = "correct"
         else:
             db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": False})
+            status = "wrong"
         db.session.commit()
+    else:
+        if answer == exercise[1]["correct_answer"]:
+            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": True})
+            status = "correct"
+        else:
+            db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": False})
+            status = "wrong"
+        db.session.commit()
+    return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}")
 
 @app.route("/leavecourse")
 def leavecourse():
