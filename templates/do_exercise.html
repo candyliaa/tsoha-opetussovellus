@@ -2,5 +2,16 @@
 {% block title %}Tehtävien teko{% endblock %}
 
 {% block content %}
-
+<a href="/exercises_materials?id={{ course['id'] }}">Takaisin kurssin materiaaleihin</a>
+<h2 style="margin-bottom: 0px">{{ course['name'] }} Tehtävä {{ exercise_num }}</h2>
+<br>
+<h2 style="margin-top: 5px">{{ exercise[1] }}</h2>
+<form action="/submit_answer">
+    {% if exercise[2] is not mapping %}
+    <p>Kirjoita vastaus seuraavaan teksikenttään:</p>
+    <textarea name="answer" rows="3" cols="50"></textarea>
+    {% else %}
+    <p>Valitse oikea vastaus seuraavista vaihtoehdoista:</p>
+    {% endif %}
+</form>
 {% endblock %}
