@@ -46,12 +46,13 @@
         Valinnat:
         <br>
         <ul>
-            <li><input type="radio" name="correct_answer" required></input><input name="choice1" type="text" minlength="1" required></li>
-            <li><input type="radio" name="correct_answer" required><input name="choice2" type="text" minlength="1" required></li>
-            <li><input type="radio" name="correct_answer" required><input name="choice3" type="text" minlength="1" required></li>
-            <li><input type="radio" name="correct_answer" required><input name="choice4" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" value="1" required><input name="choice1" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" value="2"><input name="choice2" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" value="3"><input name="choice3" type="text" minlength="1" required></li>
+            <li><input type="radio" name="correct_answer" value="4"><input name="choice4" type="text" minlength="1" required></li>
         </ul>
         <input type="submit" value="Luo tehtävä">
+    </form>
 </div>
 <br style="line-height: 2">
 <a href="/deletecourse?id={{course['id']}}" style="color: red">Poista kurssi</a>
