@@ -23,11 +23,11 @@
     {% if exercises[i][1] is not mapping %}
     <b>Mallivastaus</b>
     <br>
-    <textarea name="example_answer" rows="3" cols="50">{{ exercises[i][1] }}</textarea>
+    <textarea style="resize: none" name="example_answer" rows="3" cols="50" readonly >{{ exercises[i][1] }}</textarea>
     <br style="line-height: 3">
     {% else %}
     <b>Vaihtoehdot</b>
-    <ul>
+    <ul style="margin-top: 3px">
         <li> 
             {{ exercises[i][1]["choices"][0] }}
             {% if exercises[i][1]["correct_answer"] == "1" %}
