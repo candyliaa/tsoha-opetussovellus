@@ -228,15 +228,17 @@ def exercises_materials():
 
     return render_template(f"/exercises_materials.html", course=course, exercises=exercises, materials=materials)
 
-@app.route("/do_exercise", methods=["POST", "GET"])
+@app.route("/do_exercise", methods=["GET"])
 def do_exercise():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args["course_id"]
+    course_name = db.session.execute(text("SELECT name FROM courses WHERE id = :course_id"), {"course_id": course_id}).fetchone()
     exercise_id = request.args["exercise_id"]
+    exercise_num = request.args["exercise_num"]
     exercise_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id AND id = :id"
     exercise = db.session.execute(text(exercise_sql), {"course_id": course_id, "id": exercise_id}).fetchone()
-
+    return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course_name=course_name)
 
 @app.route("/leavecourse")
 def leavecourse():
