@@ -2,8 +2,6 @@
 {% block title %}Tehtävien teko{% endblock %}
 
 {% block content %}
-<a href="/exercises_materials?id={{ course['id'] }}">Takaisin kurssin materiaaleihin</a>
-<br>
 {% if request.args.get("status") == "False" %}
 <b style="color: red">Vastaus väärin!</b>
 {% elif request.args.get("status") == "True" %}
@@ -12,6 +10,7 @@
 <b style="color: red">Olet jo yrittänyt tätä tehtävää!</b>
 {% endif %}
 <h2 style="margin-bottom: 0px">{{ course['name'] }} Tehtävä {{ exercise_num }}</h2>
+<a href="/exercises_materials?id={{ course['id'] }}">Takaisin kurssin materiaaleihin</a>
 <br>
 <h2 style="margin-top: 5px">{{ exercise[1] }}</h2>
 <form action="/submit_answer" method="POST">
