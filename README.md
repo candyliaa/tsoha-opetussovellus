@@ -8,40 +8,22 @@ Tarkalleen ottaen:
     - Opettajat voivat luoda kursseja, muokata niitä ja poistaa niitä, sekä tarkastelemaan tilastoja
 
 # Ohjelman käynnistys
-Ohjelma on kirjoitettu Python -kielellä, käyttämällä tietokantana PostgreSQL -tietokantaa. Käytössä on Windows 10 -laite, jolla on WSL2 -asennus. 
-Paketteja on hallittu Conda -ohjelman avulla: https://docs.conda.io/en/latest/
-
-Muut samankaltaiset pakettienhallintaohjelmat käyvät myös, mutta ohjeet ovat tehty olettaen, että käytössä on Conda.
-
 Kloonaa ensin tämä repositorio:
 ```
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus
 ``` 
-ja luo virtuaaliympäristö Condan avulla:
-```
-$ conda create --name nimi
-```
-Aktivoi virtuaaliympäristö:
-```
-$ conda activate nimi
-```
-Projektissa on käytetty seuraavia kirjastoja:
+Projektissa käytetään [Docker](https://www.docker.com/) -ohjelmaa. 
+Opas Dockerin käyttöön Python web-applikaation kanssa löytyy [täältä](https://docs.docker.com/compose/gettingstarted/).
 
-https://flask.palletsprojects.com/en/3.0.x/installation/ (`flask` ja `flask-sqlalchemy`)
+Muuta `compose.yaml.example` -tiedoston nimeksi `compose.yaml` ja sijoita SECRET_KEY kenttään salainen avain. Voit luoda salaisen avaimen seuraavasti:
+```
+$ python3
+>>> import secrets
+>>> secrets.token_hex(16)
+```
+Docker huolehtii projektissa käytetyistä paketeista ja tietokannasta. Sinun täytyy vain käyttää komentoa
+`docker compose up`
+käynnistääksesi ohjelman. Voit sen jälkeen avata ohjelman osoitteessa http://localhost:8000 .
 
-https://pypi.org/project/psycopg2/ (`psycopg2`)
-
-https://pypi.org/project/python-dotenv/ (`python-dotenv`)
-
-Voit asentaa kirjastot seuraavalla komennolla:
-```
-$ conda install package
-```
-Määritä tietokannan skeema seuraavalla komennolla:
-```
-$ psql < schema.sql
-```
-Ohjelman voi nyt käynnistää tällä komennolla:
-```
-flask run
-```
+Jos haluat nähdä, mitä paketteja ohjelmassa käytetään, ne löytyy `requirements.txt` -tiedostosta hakemistosta `app`.
+`db` -hakemistossa olevassa `test_data.sql` -tiedostossa on dataa, jonka avulla ohjelmaa voi testata. Sieltä löytyy käyttäjätilien tiedot.
