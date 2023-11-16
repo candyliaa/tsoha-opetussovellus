@@ -9,7 +9,9 @@
 <h3>Kurssilla ei ole tekstimateriaaleja.</h3>
 {% else %}
 <h3>Tekstimateriaaleja: {{ materials|length }}</h3>
+{% if request.args.get("status") == "material_added" %}
 <p>Tekstimateriaali lisätty onnistuneesti!</p>
+{% endif %}
 <button onclick="openDiv('list-materials')">Listaa tekstimateriaalit</button>
 <div id="list-materials" style="display: none">
     {% for i in range(materials|length) %}
