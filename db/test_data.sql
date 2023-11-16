@@ -14,4 +14,4 @@ INSERT INTO courses (name, credits) VALUES ('ohja', 5);
 INSERT INTO course_teachers(course_id, teacher_id) VALUES (1, 1);
 INSERT INTO course_participants(course_id, student_id) VALUES (1, 1);
 
-INSERT INTO exercises (question, choices, course_id) VALUES ("Kuinka paljon on 1+2?", "3", 1)
+INSERT INTO exercises (question, choices, course_id) VALUES ('Kuinka paljon on 1+2?', '3', 1)
