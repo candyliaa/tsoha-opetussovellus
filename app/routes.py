@@ -118,7 +118,7 @@ def modifycourse():
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
     exercises = []
     for exercise in course_exercises:
-        exercises.append((exercise[1], exercise[2]))
+        exercises.append((exercise[0], exercise[1], exercise[2]))
     return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials)
 
 @app.route("/addtextmaterial", methods=["POST"])
@@ -174,6 +174,20 @@ def exercisecreated():
             db.session.execute(text(add_exercise_sql), {"question": question, "choices": choices_dict, "course_id": course_id})
             db.session.commit()
         return redirect(f"/modifycourse?id={course_id}&status=exercise_added")
+
+@app.route("/delete_exercise", methods=["POST", "GET"])
+def delete_exercise():
+    if session["role"] != "teacher":
+        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    course_id = request.args.get("course_id")
+    exercise_id = request.args.get("exercise_id")
+    delete_exercise_sql = """
+                          DELETE FROM exercises
+                          WHERE course_id = :course_id AND id = :exercise_id
+                          """
+    db.session.execute(text(delete_exercise_sql), {"course_id": course_id, "exercise_id": exercise_id})
+    db.session.commit()
+    return redirect(f"/modifycourse?id={course_id}&status=exercise_removed")
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():

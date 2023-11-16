@@ -48,7 +48,9 @@
 {% else %}
 <h3>Tehtäviä: {{ exercises|length }}</h3>
 {% endif %}
-
+{% if request.args.get("status") == "exercise_removed" %}
+<p>Tehtävä poistettu onnistuneesti!</p>
+{% endif %}
 {% if exercises|length != 0 %}
 {% if request.args.get("status") == "exercise_added" %}
 <p>Tehtävä lisätty onnistuneesti!</p>
@@ -60,37 +62,39 @@
     {% for i in range(exercises|length) %}
     <b>{{ i + 1 }}. tehtävä</b>
     <br>
-    {{exercises[i][0]}}
+    <a href="/delete_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i][0] }}" style="color: red">Poista tehtävä</a>
     <br>
-    {% if exercises[i][1] is not mapping %}
+    {{exercises[i][1]}}
+    <br>
+    {% if exercises[i][2] is not mapping %}
     <b>Mallivastaus</b>
     <br>
-    <textarea style="resize: none" name="example_answer" rows="3" cols="50" readonly >{{ exercises[i][1] }}</textarea>
+    <textarea style="resize: none" name="example_answer" rows="3" cols="50" readonly >{{ exercises[i][2] }}</textarea>
     <br style="line-height: 3">
     {% else %}
     <b>Vaihtoehdot</b>
     <ul style="margin-top: 3px">
         <li> 
-            {{ exercises[i][1]["choices"][0] }}
-            {% if exercises[i][1]["correct_answer"] == "1" %}
+            {{ exercises[i][2]["choices"][0] }}
+            {% if exercises[i][2]["correct_answer"] == "1" %}
             ✔
             {% endif %}
         </li> 
         <li>
-            {{ exercises[i][1]["choices"][1] }}
-            {% if exercises[i][1]["correct_answer"] == "2" %}
+            {{ exercises[i][2]["choices"][1] }}
+            {% if exercises[i][2]["correct_answer"] == "2" %}
             ✔
             {% endif %}
         </li>
         <li>
-            {{ exercises[i][1]["choices"][2] }}
-            {% if exercises[i][1]["correct_answer"] == "3" %}
+            {{ exercises[i][2]["choices"][2] }}
+            {% if exercises[i][2]["correct_answer"] == "3" %}
             ✔
             {% endif %}
         </li>
         <li>
-            {{ exercises[i][1]["choices"][3] }}
-            {% if exercises[i][1]["correct_answer"] == "4" %}
+            {{ exercises[i][2]["choices"][3] }}
+            {% if exercises[i][2]["correct_answer"] == "4" %}
             ✔
             {% endif %}
         </li>
