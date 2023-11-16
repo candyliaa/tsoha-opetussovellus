@@ -44,9 +44,9 @@ def accountcreated():
     hash_value = generate_password_hash(password)
     account_type = request.form["role"]
     if account_type == "teacher":
-        sql = "INSERT INTO teacher_accounts (username, password) VALUES (:username, :password)"
+        sql = "INSERT INTO teacher_accounts (username, password) VALUES (:username, :password) RETURNING id"
     else:
-        sql = "INSERT INTO student_accounts (username, password) VALUES (:username, :password)"
+        sql = "INSERT INTO student_accounts (username, password) VALUES (:username, :password) RETURNING id"
     return_value = db.session.execute(text(sql), {"username": username, "password": hash_value})
     db.session.commit()
     session["username"] = username
@@ -119,7 +119,41 @@ def modifycourse():
     exercises = []
     for exercise in course_exercises:
         exercises.append((exercise[0], exercise[1], exercise[2]))
-    return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials)
+
+    course_participants_sql = """
+                              SELECT id, username
+                              FROM course_participants
+                              LEFT JOIN student_accounts
+                              ON course_participants.student_id = student_accounts.id
+                              WHERE course_id = :course_id
+                              """
+    course_participants = db.session.execute(text(course_participants_sql), {"course_id": course_id}).fetchall()
+
+    current_exercise_submissions_sql = """
+                                       SELECT student_id, correct
+                                       FROM exercise_answers
+                                       WHERE exercise_id = :exercise_id
+                                       """
+    submissions = []
+    for exercise in course_exercises:
+        exercise_submission = {}
+        all_submissions = db.session.execute(text(current_exercise_submissions_sql), {"exercise_id": exercise[0]}).fetchall()
+        all_submissions_dict = {}
+        for submission in all_submissions:
+            all_submissions_dict[submission[0]] = submission[1]
+
+        for student in course_participants:
+            exercise_submission[student[0]] = {
+                "username": student[1],
+            }
+            if student[0] not in all_submissions_dict:
+                exercise_submission[student[0]]["state"] = "missing"
+            elif all_submissions_dict[student[0]]:
+                exercise_submission[student[0]]["state"] = "correct"
+            elif not all_submissions_dict[student[0]]:
+                exercise_submission[student[0]]["state"] = "incorrect"
+        submissions.append(exercise_submission)
+    return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials, submissions=submissions)
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
@@ -292,7 +326,6 @@ def submit_answer():
                                  WHERE student_id = :student_id AND course_id = :course_id AND exercise_id = :exercise_id
                                  """
     result = db.session.execute(text(check_if_answer_exists_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id}).fetchone()
-    print(result)
     if result is not None:
         status = "already_submitted"
         return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}")

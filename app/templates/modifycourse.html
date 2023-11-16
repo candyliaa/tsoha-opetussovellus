@@ -146,7 +146,24 @@
 <br style="line-height: 2">
 <a href="/deletecourse?id={{course['id']}}" style="color: red">Poista kurssi</a>
 <hr>
-<h2>Tilastoja:</h2>
+<h2>Tehtävien tilastoja:</h2>
+{% for i in range(submissions|length) %}
+<b>Tehtävä {{i + 1}}</b>
+<ul>
+    {% for _, student in submissions[i].items() %}
+    <li>
+        {{ student["username"] }} 
+        {% if student["state"] == "correct" %}
+        ✔
+        {% elif student["state"] == "incorrect" %}
+        ✖
+        {% elif student["state"] == "missing" %}
+        //
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endfor %}
 <!--Scripts for the buttons on this page-->
 <script>
     function openDiv(divID) {
