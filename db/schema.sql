@@ -1,9 +1,3 @@
-DROP DATABASE IF EXISTS tsoha;
-
-CREATE DATABASE tsoha;
-
-\c tsoha
-
 CREATE TABLE student_accounts (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT);
 
 CREATE TABLE teacher_accounts (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT);
