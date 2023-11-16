@@ -12,10 +12,10 @@ Kloonaa ensin tämä repositorio:
 ```
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus
 ``` 
-Projektissa käytetään [Docker](https://www.docker.com/) -ohjelmaa. 
+Projektissa käytetään [Docker](https://www.docker.com/) -ohjelmaa. Asenna se omalle tietokoneellesi [täältä](https://docs.docker.com/get-docker/).
 Opas Dockerin käyttöön Python web-applikaation kanssa löytyy [täältä](https://docs.docker.com/compose/gettingstarted/).
 
-Muuta `compose.yaml.example` -tiedoston nimeksi `compose.yaml` ja sijoita SECRET_KEY -kenttään salainen avain. Voit luoda salaisen avaimen seuraavasti:
+Muuta `compose.yaml.example` -tiedoston nimeksi `compose.yaml` ja sijoita `SECRET_KEY` -kenttään salainen avain. Voit luoda salaisen avaimen seuraavasti:
 ```
 $ python3
 >>> import secrets
