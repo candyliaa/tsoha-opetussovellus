@@ -1,6 +1,7 @@
 services:
   web:
     build: app
+    stop_signal: SIGINT
     ports:
       - "8000:5000"
     environment:
