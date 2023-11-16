@@ -89,6 +89,7 @@ def coursetools():
                   ORDER BY name ASC
                   """
     courses = db.session.execute(text(courses_sql)).fetchall()
+    print(courses)
     return render_template("coursetools.html", courses=courses)
 
 @app.route("/deletecourse")
@@ -230,17 +231,26 @@ def coursesview():
     if session["role"] != "student":
         return render_template("error.html", error="Et ole opiskelija")
     user_id = session["user_id"]
-    own_courses_sql = """
-                      SELECT courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
-                      LEFT JOIN course_participants ON
-                      courses.id = course_participants.course_id
-                      LEFT JOIN course_teachers ON
-                      courses.id = course_teachers.course_id
-                      LEFT JOIN teacher_accounts ON
-                      course_teachers.teacher_id = teacher_accounts.id
-                      WHERE course_participants.student_id = :student_id
-                      ORDER BY name ASC
-                      """
+    courses_sql = """
+                  SELECT
+                   courses.id,
+                   courses.name,
+                   courses.credits,
+                   STRING_AGG(teacher_accounts.username, ', ') AS teacher_names,
+                   ARRAY_AGG(course_participants.student_id) AS student_ids
+                  FROM courses
+                  LEFT JOIN course_participants ON
+                  courses.id = course_participants.course_id
+                  LEFT JOIN course_teachers ON
+                  courses.id = course_teachers.course_id
+                  LEFT JOIN teacher_accounts ON
+                  course_teachers.teacher_id = teacher_accounts.id
+                  GROUP BY courses.id
+                  ORDER BY name ASC
+                  """
+    all_courses = db.session.execute(text(courses_sql)).fetchall()
+    own_courses = list(filter(lambda c: user_id in c[4], all_courses))
+    other_courses = list(filter(lambda c: user_id not in c[4], all_courses))
     exercises_done_sql = """
                          SELECT course_id, COUNT(id) 
                          FROM exercise_answers
@@ -260,19 +270,6 @@ def coursesview():
     total_exercises_dict = {}
     for course in total_exercises:
         total_exercises_dict[course[0]] = course[1]
-    own_courses = db.session.execute(text(own_courses_sql), {"student_id": user_id}).fetchall()
-    other_courses_sql = """
-                        SELECT courses.id, course_participants.student_id, courses.id, name, credits, teacher_accounts.username AS teacher_names FROM courses
-                        LEFT JOIN course_participants ON
-                        courses.id = course_participants.course_id
-                        LEFT JOIN course_teachers ON
-                        courses.id = course_teachers.course_id
-                        LEFT JOIN teacher_accounts ON
-                        course_teachers.teacher_id = teacher_accounts.id
-                        WHERE COALESCE(course_participants.student_id <> :student_id, TRUE)
-                        ORDER BY name ASC
-                        """
-    other_courses = db.session.execute(text(other_courses_sql), {"student_id": user_id}).fetchall()
     return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses, exercises_done_dict=exercises_done_dict, total_exercises_dict=total_exercises_dict)
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
