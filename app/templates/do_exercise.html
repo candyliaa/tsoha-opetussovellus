@@ -2,10 +2,10 @@
 {% block title %}Tehtävien teko{% endblock %}
 
 {% block content %}
-{% if request.args.get("status") == "False" %}
-<b style="color: red">Vastaus väärin!</b>
-{% elif request.args.get("status") == "True" %}
+{% if request.args.get("status") == "True" %}
 <b style="color: green">Vastaus oikein!</b>
+{% elif request.args.get("status") == "False" %}
+<b style="color: red">Vastaus väärin!</b>
 {% elif request.args.get("status") == "already_submitted" %}
 <b style="color: red">Olet jo yrittänyt tätä tehtävää!</b>
 {% endif %}
@@ -20,7 +20,12 @@
     {% if exercise[2] is not mapping %}
     <input type="hidden" name="exercise_type" value="text_exercise">
     <p>Kirjoita vastaus seuraavaan teksikenttään:</p>
-    <textarea name="answer" rows="3" cols="50" required></textarea>
+    <textarea name="answer" rows="4" cols="50" minlength="100"></textarea>
+    <p>(Vastaa väh. 100 merkillä.)</p>
+    {% if request.args.get("show_answer") == True %}
+    <b>Mallivastaus:</b>
+    <textarea style="resize: none" name="example_answer" rows="4" cols="50" readonly>{{ exercise["choices"] }}</textarea>
+    {% endif %}
     {% else %}
     <input type="hidden" name="exercise_type" value="multiple_choice">
     <p>Valitse oikea vastaus seuraavista vaihtoehdoista:</p>

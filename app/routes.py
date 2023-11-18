@@ -102,8 +102,8 @@ def coursetools():
                     p.student_count,
                     teacher_accounts.username
                   FROM courses
-                  JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
-                  JOIN (
+                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
+                  LEFT JOIN (
                     SELECT course_id, COUNT(student_id) AS student_count
                     FROM course_participants
                     GROUP BY course_id
@@ -218,7 +218,7 @@ def addtextmaterial():
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
-    course_id = request.args.get("id")
+    course_id = request.form["course_id"]
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if not correct_teacher(course_id):
@@ -260,7 +260,7 @@ def exercisecreated():
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
 def delete_exercise():
-    course_id = request.args.get("id")
+    course_id = request.args.get("course_id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if not correct_teacher(course_id):
@@ -284,11 +284,11 @@ def coursesview():
                     courses.id,
                     name,
                     credits,
-                    student_ids,
+                    COALESCE(student_ids, '{}'),
                     teacher_accounts.username
                   FROM courses
-                  JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
-                  JOIN (
+                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
+                  LEFT JOIN (
                     SELECT course_id, ARRAY_AGG(student_id) AS student_ids
                     FROM course_participants
                     GROUP BY course_id
@@ -296,6 +296,7 @@ def coursesview():
                   p ON courses.id = p.course_id
                   """
     all_courses = db.session.execute(text(courses_sql)).fetchall()
+    print(all_courses)
     own_courses = list(filter(lambda c: user_id in c[3], all_courses))
     other_courses = list(filter(lambda c: user_id not in c[3], all_courses))
     exercises_done_sql = """
@@ -379,10 +380,9 @@ def submit_answer():
                        VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
                        """
     if exercise_type == "text_exercise":
-        if answer == exercise[1]:
+        if len(request.form["answer"]) >= 100:
             status = True
-        else:
-            status = False
+            return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}&show_answer={True}")
     elif exercise_type == "multiple_choice":
         if answer == exercise[1]["correct_answer"]:
             status = True
