@@ -10,14 +10,14 @@ def permission_check(role = None):
         return False
     return True
 
-def student_in_course():
+def student_in_course(course_id: str):
     student_id = session["user_id"]
     student_in_course_check_sql = """
                                     SELECT student_id
                                     FROM course_participants
-                                    WHERE student_id = :student_id
+                                    WHERE student_id = :student_id AND course_id = :course_id
                                     """
-    if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id}).fetchone() is None:
+    if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id, "course_id": course_id}).fetchone() is None:
         return False
     return True
 
@@ -292,10 +292,10 @@ def coursesview():
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
-    if not permission_check("student"):
+    course_id = request.args["id"]
+    if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     student_in_course()
-    course_id = request.args["id"]
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
 
@@ -312,9 +312,9 @@ def exercises_materials():
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
-    if not permission_check("student") or not student_in_course():
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args["course_id"]
+    if not permission_check("student") or not student_in_course(course_id):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course = db.session.execute(text("SELECT id, name FROM courses WHERE id = :course_id"), {"course_id": course_id}).fetchone()
     exercise_id = request.args["exercise_id"]
     exercise_num = request.args["exercise_num"]
@@ -324,11 +324,11 @@ def do_exercise():
 
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
-    if not permission_check("student") or not student_in_course():
+    course_id = request.form["course_id"]
+    if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     answer = request.form["answer"]
     student_id = session["user_id"]
-    course_id = request.form["course_id"]
     exercise_id = request.form["exercise_id"]
     exercise_type = request.form["exercise_type"]
     exercise_num = request.form["exercise_num"]
@@ -382,9 +382,9 @@ def joincourse():
 
 @app.route("/leavecourse")
 def leavecourse():
-    if not permission_check("student") or not student_in_course():
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args.get("id")
+    if not permission_check("student") or not student_in_course(course_id):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     student_id = session["user_id"]
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
