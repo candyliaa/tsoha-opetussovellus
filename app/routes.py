@@ -276,6 +276,14 @@ def coursesview():
 def exercises_materials():
     if session["role"] != "student":
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    student_id = session["user_id"]
+    student_in_course_check_sql = """
+                                  SELECT student_id
+                                  FROM course_participants
+                                  WHERE student_id = :student_id
+                                  """
+    if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id}).fetchone() is None:
+        return render_template("error.html", error="Et ole tällä kurssilla!")
     course_id = request.args["id"]
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
