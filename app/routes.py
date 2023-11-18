@@ -67,6 +67,20 @@ def coursetools():
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
     if session["role"] != "teacher":
         return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    courses_sql = """
+                  SELECT courses.id, name, credits, COUNT(course_participants.student_id) AS student_count, STRING_AGG(teacher_accounts.username, ', ') AS teacher_names
+                  FROM courses
+                  LEFT JOIN course_participants ON courses.id = course_participants.course_id
+                  LEFT JOIN course_teachers ON courses.id = course_teachers.course_id
+                  LEFT JOIN teacher_accounts ON course_teachers.teacher_id = teacher_accounts.id
+                  GROUP BY courses.id
+                  ORDER BY name ASC
+                  """
+    courses = db.session.execute(text(courses_sql)).fetchall()
+    return render_template("coursetools.html", courses=courses)
+
+@app.route("/createcourse", methods=["POST"])
+def createcourse():
     if request.method == "POST":
         course_name = request.form["course_name"]
         credits = int(request.form["credits"])
@@ -79,18 +93,6 @@ def coursetools():
         db.session.execute(text(sql), {"course_name": course_name, "credits": credits})
         db.session.commit()
         return redirect(f"/coursetools?status=success&name={course_name}")
-    courses_sql = """
-                  SELECT courses.id, name, credits, COUNT(course_participants.student_id) AS student_count, STRING_AGG(teacher_accounts.username, ', ') AS teacher_names
-                  FROM courses
-                  LEFT JOIN course_participants ON courses.id = course_participants.course_id
-                  LEFT JOIN course_teachers ON courses.id = course_teachers.course_id
-                  LEFT JOIN teacher_accounts ON course_teachers.teacher_id = teacher_accounts.id
-                  GROUP BY courses.id
-                  ORDER BY name ASC
-                  """
-    courses = db.session.execute(text(courses_sql)).fetchall()
-    print(courses)
-    return render_template("coursetools.html", courses=courses)
 
 @app.route("/deletecourse")
 def deletecourse():
