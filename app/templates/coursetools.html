@@ -3,7 +3,7 @@
 {% block title %}Kurssityökalut{% endblock %}
 {% block content %}
 <h2>Luo kurssi</h2>
-<form action="/coursetools" method="POST">
+<form action="/createcourse" method="POST">
     <label for="course_name">Kurssin nimi:</label>
     <input name="course_name" type="text" minlength="1" required>
     <br>
