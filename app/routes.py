@@ -84,7 +84,12 @@ def coursetools():
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     courses_sql = """
-                  SELECT courses.id, name, credits, COUNT(course_participants.student_id) AS student_count, (ARRAY_AGG(teacher_accounts.username)) AS teacher_name
+                  SELECT 
+                    courses.id,
+                    name,
+                    credits,
+                    COUNT(course_participants.student_id) AS student_count,
+                    (STRING_AGG(teacher_accounts.username, ', ')) AS teacher_name
                   FROM courses
                   LEFT JOIN course_participants ON courses.id = course_participants.course_id
                   LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
@@ -253,15 +258,13 @@ def coursesview():
                    courses.id,
                    courses.name,
                    courses.credits,
-                   STRING_AGG(teacher_accounts.username, ', ') AS teacher_names,
+                   STRING_AGG(teacher_accounts.username, ', ') AS teacher_name,
                    ARRAY_AGG(course_participants.student_id) AS student_ids
                   FROM courses
-                  LEFT JOIN course_participants ON
-                  courses.id = course_participants.course_id
-                  LEFT JOIN course_teachers ON
-                  courses.id = course_teachers.course_id
-                  LEFT JOIN teacher_accounts ON
-                  course_teachers.teacher_id = teacher_accounts.id
+                  LEFT JOIN course_participants
+                   ON courses.id = course_participants.course_id
+                  LEFT JOIN teacher_accounts 
+                   ON courses.teacher_id = teacher_accounts.id
                   GROUP BY courses.id
                   ORDER BY name ASC
                   """
