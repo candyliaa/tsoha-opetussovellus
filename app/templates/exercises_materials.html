@@ -31,7 +31,14 @@
 {% if i % 5 == 0 %}
 <br>
 {% endif %}
-<a href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i][0] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
+{% if exercises[i]["correct"] == True %}
+{% set col = "green" %}
+{% elif exercises[i]["correct"] == False %}
+{% set col = "red" %}
+{% else %}
+{% set col = "orange" %}
+{% endif %}
+<a style="color: {{ col }}" href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i]['id'] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
 {% endfor %}
 {% endif %}
 <script>

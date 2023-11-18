@@ -331,13 +331,21 @@ def exercises_materials():
     materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
     materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
     
-    course_exercises_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id ORDER BY id"                     
-    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
-    exercises = []
-    for exercise in course_exercises:
-        exercises.append((exercise[0], exercise[1], exercise[2]))
-
-    return render_template(f"/exercises_materials.html", course=course, exercises=exercises, materials=materials)
+    student_id = session["user_id"]
+    course_exercises_sql = """
+                           SELECT 
+                           exercises.id, 
+                           question,
+                           choices,
+                           correct
+                           FROM exercises
+                           LEFT JOIN exercise_answers ON
+                            exercises.id = exercise_answers.exercise_id
+                           WHERE exercises.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id, TRUE)
+                           ORDER BY id
+                           """
+    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+    return render_template(f"/exercises_materials.html", course=course, exercises=course_exercises, materials=materials)
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
