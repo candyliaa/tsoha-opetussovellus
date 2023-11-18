@@ -380,9 +380,8 @@ def submit_answer():
                        VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
                        """
     if exercise_type == "text_exercise":
-        if len(request.form["answer"]) >= 100:
+        if len(request.form["answer"]) >= 50:
             status = True
-            return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}&show_answer={True}")
     elif exercise_type == "multiple_choice":
         if answer == exercise[1]["correct_answer"]:
             status = True
@@ -390,7 +389,7 @@ def submit_answer():
             status = False
     db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": status})
     db.session.commit()
-    return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}")
+    return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}&show_answer={True}")
 
 @app.route("/joincourse")
 def joincourse():

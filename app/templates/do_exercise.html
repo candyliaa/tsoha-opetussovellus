@@ -20,12 +20,13 @@
     {% if exercise[2] is not mapping %}
     <input type="hidden" name="exercise_type" value="text_exercise">
     <p>Kirjoita vastaus (väh. 50 merkkiä) seuraavaan teksikenttään:</p>
-    <textarea id="answer-input" name="answer" rows="4" cols="50" minlength="100" required></textarea>
+    <textarea id="answer-input" name="answer" rows="4" cols="50" minlength="50" required></textarea>
     <p style="margin-top: 0px; color: #86857f">
         Merkkejä: <span id="counter">0</span>
     </p>
-    {% if request.args.get("show_answer") == True %}
+    {% if request.args.get("show_answer") == "True" %}
     <b>Mallivastaus:</b>
+    <br>
     <textarea style="resize: none" name="example_answer" rows="4" cols="50" readonly>{{ exercise["choices"] }}</textarea>
     {% endif %}
     {% else %}
@@ -37,6 +38,11 @@
         <li> <input type="radio" name="answer" value="3"> {{ exercise[2]["choices"][2] }}</li>
         <li> <input type="radio" name="answer" value="4"> {{ exercise[2]["choices"][3] }}</li>
     </ul>
+    {% if request.args.get("show_answer") == "True" %}
+    <b>Oikea vastaus:</b>
+    <br>
+    <b> {{ exercise[2]["choices"][exercise[2]["correct_answer"]|int - 1] }}</b>
+    {% endif %}
     {% endif %}
     <br>
     <input type="submit" value="Lähetä vastaus">
