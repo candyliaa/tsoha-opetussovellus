@@ -7,6 +7,7 @@ services:
     environment:
       SECRET_KEY: KEY GOES HERE
       DATABASE_URL: postgresql://tsoha:tsoha123@db/tsoha
+      PYTHONUNBUFFERED: 1
   db:
     build: db
     ports:
