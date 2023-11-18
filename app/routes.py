@@ -353,6 +353,20 @@ def submit_answer():
     db.session.commit()
     return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}")
 
+@app.route("/joincourse")
+def joincourse():
+    course_id = request.args.get("id")
+    student_id = session["user_id"]
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
+    course_join_sql = """
+                      INSERT INTO course_participants (course_id, student_id)
+                      VALUES (:course_id, :student_id)
+                      """
+    db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
+    db.session.commit()
+    return redirect(f"/coursesview?status=joined&name={course_name}")
+
 @app.route("/leavecourse")
 def leavecourse():
     course_id = request.args.get("id")
@@ -375,16 +389,3 @@ def leavecourse():
     db.session.commit()
     return redirect(f"/coursesview?status=left&name={course_name}")
 
-@app.route("/joincourse")
-def joincourse():
-    course_id = request.args.get("id")
-    student_id = session["user_id"]
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
-    course_join_sql = """
-                      INSERT INTO course_participants (course_id, student_id)
-                      VALUES (:course_id, :student_id)
-                      """
-    db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
-    db.session.commit()
-    return redirect(f"/coursesview?status=joined&name={course_name}")
