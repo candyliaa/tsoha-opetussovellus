@@ -8,10 +8,8 @@ INSERT INTO teacher_accounts (username, password) VALUES ('opettaja1', 'pbkdf2:s
 -- password: 67890
 INSERT INTO teacher_accounts (username, password) VALUES ('opettaja2', 'pbkdf2:sha256:260000$8cKJzkyNOD1dPxgM$a6e97ce36f23842a90d5907bf221d6b399198ec9b870dc0cb5ca98088fca2d54');
 
-INSERT INTO courses (name, credits) VALUES ('ohpe', 5);
-INSERT INTO courses (name, credits) VALUES ('ohja', 5);
+INSERT INTO courses (name, credits, teacher_id) VALUES ('ohpe', 5, 1);
 
-INSERT INTO course_teachers(course_id, teacher_id) VALUES (1, 1);
 INSERT INTO course_participants(course_id, student_id) VALUES (1, 1);
 
 INSERT INTO exercises (question, choices, course_id) VALUES ('Kuinka paljon on 1+2?', '3', 1)
