@@ -13,11 +13,22 @@ def permission_check(role = None):
 def student_in_course(course_id: str):
     student_id = session["user_id"]
     student_in_course_check_sql = """
-                                    SELECT student_id
-                                    FROM course_participants
-                                    WHERE student_id = :student_id AND course_id = :course_id
-                                    """
+                                  SELECT student_id
+                                  FROM course_participants
+                                  WHERE student_id = :student_id AND course_id = :course_id
+                                  """
     if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id, "course_id": course_id}).fetchone() is None:
+        return False
+    return True
+
+def correct_teacher(course_id: str):
+    teacher_id = session["user_id"]
+    correct_teacher_check_sql = """
+                                SELECT teacher_id
+                                FROM courses
+                                WHERE courses.id = :course_id
+                                """
+    if db.session.execute(text(correct_teacher_check_sql), {"course_id": course_id}).fetchone()[0] != teacher_id:
         return False
     return True
 
@@ -118,9 +129,11 @@ def createcourse():
 
 @app.route("/deletecourse")
 def deletecourse():
+    course_id = request.args.get("id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course_id = request.args.get("id")
+    if not correct_teacher(course_id):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
     sql = "DELETE FROM courses WHERE id =:course_id"
@@ -130,9 +143,11 @@ def deletecourse():
 
 @app.route("/modifycourse", methods=["POST", "GET"])
 def modifycourse():
+    course_id = request.args.get("id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course_id = request.args.get("id")
+    if not correct_teacher(course_id):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
 
@@ -182,7 +197,10 @@ def modifycourse():
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
+    course_id = request.args.get("id")
     if not permission_check("teacher"):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    if not correct_teacher(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.form["course_id"]
     title = request.form["title"]
@@ -197,7 +215,10 @@ def addtextmaterial():
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
+    course_id = request.args.get("id")
     if not permission_check("teacher"):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    if not correct_teacher(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
         if request.form["exercise_type"] == "text_question":
@@ -236,9 +257,11 @@ def exercisecreated():
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
 def delete_exercise():
+    course_id = request.args.get("id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course_id = request.args.get("course_id")
+    if not correct_teacher(course_id):
+        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     exercise_id = request.args.get("exercise_id")
     delete_exercise_sql = """
                           DELETE FROM exercises

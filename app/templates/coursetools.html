@@ -47,8 +47,10 @@
             <td>{{ course["credits"] }}</td>
             <td>{{ course["teacher_name"] }}</td>
             <td>{{ course["student_count"] }}</td>
+            {% if session["username"] == course["teacher_name"] %}
             <td><a href="/deletecourse?id={{course[0]}}" style="color: red">Poista kurssi</a></td>
             <td><a href="/modifycourse?id={{course[0]}}">Muokkaa kurssia</a></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>
