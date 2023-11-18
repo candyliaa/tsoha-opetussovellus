@@ -19,9 +19,11 @@
     <input type="hidden" name="exercise_num" value="{{ exercise_num }}">
     {% if exercise[2] is not mapping %}
     <input type="hidden" name="exercise_type" value="text_exercise">
-    <p>Kirjoita vastaus seuraavaan teksikenttään:</p>
-    <textarea name="answer" rows="4" cols="50" minlength="100"></textarea>
-    <p>(Vastaa väh. 100 merkillä.)</p>
+    <p>Kirjoita vastaus (väh. 50 merkkiä) seuraavaan teksikenttään:</p>
+    <textarea id="answer-input" name="answer" rows="4" cols="50" minlength="100" required></textarea>
+    <p style="margin-top: 0px; color: #86857f">
+        Merkkejä: <span id="counter">0</span>
+    </p>
     {% if request.args.get("show_answer") == True %}
     <b>Mallivastaus:</b>
     <textarea style="resize: none" name="example_answer" rows="4" cols="50" readonly>{{ exercise["choices"] }}</textarea>
@@ -39,4 +41,10 @@
     <br>
     <input type="submit" value="Lähetä vastaus">
 </form>
+<script>
+    document.getElementById("answer-input").onkeyup = function countChars(event) {
+        const counterElement = document.getElementById("counter");
+        counter.innerText = event.target.value.length;
+    };
+</script>
 {% endblock %}
