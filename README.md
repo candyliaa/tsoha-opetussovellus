@@ -4,8 +4,18 @@ Sovelluksen tavoitteena on sama toiminnallisuus kuin kurssin aiheista "opetussov
 Tarkalleen ottaen:
 -  Käyttäjätunnusten luonti ja kirjautuminen
 -  Erilaisia käyttäjätyyppejä; oppilailla ja opettajilla on eri toiminnallisuus
-    - Opiskelijat voivat liittyä kursseille ja tehdä tehtäviä, sekä tarkastelemaan niiden tilannetta - opiskelijat voivat myös nähdä suoritetut kurssit ja opintopistetilanteen
-    - Opettajat voivat luoda kursseja, muokata niitä ja poistaa niitä, sekä tarkastelemaan tilastoja
+    - Opiskelijat voivat liittyä kursseille ja tehdä tehtäviä, sekä tarkastelemaan niiden tilannetta.
+    - Opettajat voivat luoda kursseja, luoda tehtäviä niihin, tarkastelemaan tehtävien tiloja ja poistamaan kursseja.
+
+# Tämänhetkinen toiminnallisuus
+Tällä hetkellä ohjelmalla pystyy:
+- Luoda käyttäjätilin
+- Kirjautua sisään
+- Opettajat voivat nähdä kaikki kurssit, niiden opettajan ja kuinka monta opiskelijaa kurssilla on
+- Opettajat voivat luoda kursseja sekä poistaa niitä
+- Opettajat voivat lisätä kurssille tehtäviä (tekstitehtävä tai monivalintatehtävä) sekä nähdä, ketkä opiskelijat ovat tehneet mitkä tehtävät
+- Opiskelijat voivat myös nähdä kaikki kurssit, liittyä niihin ja poistua niistä
+- Opiskelijat voivat tehdä tehtäviä ja saada palautteen, onko se oikein vai väärin
 
 # Ohjelman käynnistys
 Kloonaa ensin tämä repositorio:
@@ -29,3 +39,4 @@ Voit sen jälkeen avata ohjelman osoitteessa http://localhost:8000 .
 
 Jos haluat nähdä, mitä paketteja ohjelmassa käytetään, ne löytyy `requirements.txt` -tiedostosta hakemistosta `app`.
 `db` -hakemistossa olevassa `test_data.sql` -tiedostossa on dataa, jonka avulla ohjelmaa voi testata. Sieltä löytyy käyttäjätilien tiedot.
+Tietokannan rakennetta voi tarkastella `schema.sql` -tiedostossa, joka on hakemistossa `db`.
