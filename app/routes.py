@@ -5,6 +5,20 @@ from db import db
 from sqlalchemy.sql import text
 import json
 
+def permission_check(*role: str):
+    if "role" not in session.keys() or session["role"] != role:
+        return redirect("error.html", error="Ei oikeutta nähdä tätä sivua")
+    
+def student_in_course():
+    student_id = session["user_id"]
+    student_in_course_check_sql = """
+                                    SELECT student_id
+                                    FROM course_participants
+                                    WHERE student_id = :student_id
+                                    """
+    if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id}).fetchone() is None:
+        return render_template("error.html", error="Et ole tällä kurssilla!")
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -39,6 +53,7 @@ def login():
 
 @app.route("/accountcreated", methods=["POST"])
 def accountcreated():
+    permission_check()
     username = request.form["username"]
     password = request.form["password"]
     hash_value = generate_password_hash(password)
@@ -63,10 +78,7 @@ def logout():
 
 @app.route("/coursetools", methods=["POST", "GET"])
 def coursetools():
-    if not "role" in session.keys():
-        return render_template("error.html", error="Ei oikeutta nähdä sivua")
-    if session["role"] != "teacher":
-        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    permission_check("teacher")
     courses_sql = """
                   SELECT courses.id, name, credits, COUNT(course_participants.student_id) AS student_count, STRING_AGG(teacher_accounts.username, ', ') AS teacher_names
                   FROM courses
@@ -81,6 +93,7 @@ def coursetools():
 
 @app.route("/createcourse", methods=["POST"])
 def createcourse():
+    permission_check("teacher")
     if request.method == "POST":
         course_name = request.form["course_name"]
         credits = int(request.form["credits"])
@@ -96,8 +109,7 @@ def createcourse():
 
 @app.route("/deletecourse")
 def deletecourse():
-    if session["role"] != "teacher":
-        return render_template("error.html", error="Ei nähdä sivua")
+    permission_check("teacher")
     course_id = request.args.get("id")
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
@@ -108,8 +120,7 @@ def deletecourse():
 
 @app.route("/modifycourse", methods=["POST", "GET"])
 def modifycourse():
-    if session["role"] != "teacher":
-        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    permission_check("teacher")
     course_id = request.args.get("id")
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
@@ -160,8 +171,7 @@ def modifycourse():
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
-    if session["role"] != "teacher":
-        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    permission_check("teacher")
     course_id = request.form["course_id"]
     title = request.form["title"]
     body = request.form["body"]
@@ -175,8 +185,7 @@ def addtextmaterial():
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
-    if session["role"] != "teacher":
-        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    permission_check("teacher")
     if request.method == "POST":
         if request.form["exercise_type"] == "text_question":
             course_id = request.form["course_id"]
@@ -214,8 +223,7 @@ def exercisecreated():
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
 def delete_exercise():
-    if session["role"] != "teacher":
-        return render_template("error.html", error="Ei oikeutta nähdä sivua")
+    permission_check("teacher")
     course_id = request.args.get("course_id")
     exercise_id = request.args.get("exercise_id")
     delete_exercise_sql = """
@@ -228,10 +236,7 @@ def delete_exercise():
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
-    if "role" not in session.keys():
-        return render_template("error.html", error="Ei oikeutta nähddä tätä sivua")
-    if session["role"] != "student":
-        return render_template("error.html", error="Et ole opiskelija")
+    permission_check("student")
     user_id = session["user_id"]
     courses_sql = """
                   SELECT
@@ -276,16 +281,8 @@ def coursesview():
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
-    if session["role"] != "student":
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    student_id = session["user_id"]
-    student_in_course_check_sql = """
-                                  SELECT student_id
-                                  FROM course_participants
-                                  WHERE student_id = :student_id
-                                  """
-    if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id}).fetchone() is None:
-        return render_template("error.html", error="Et ole tällä kurssilla!")
+    permission_check("student")
+    student_in_course()
     course_id = request.args["id"]
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
@@ -303,8 +300,8 @@ def exercises_materials():
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
-    if session["role"] != "student":
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    permission_check("student")
+    student_in_course()
     course_id = request.args["course_id"]
     course = db.session.execute(text("SELECT id, name FROM courses WHERE id = :course_id"), {"course_id": course_id}).fetchone()
     exercise_id = request.args["exercise_id"]
@@ -315,8 +312,8 @@ def do_exercise():
 
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
-    if session["role"] != "student":
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    permission_check("student")
+    student_in_course()
     answer = request.form["answer"]
     student_id = session["user_id"]
     course_id = request.form["course_id"]
@@ -357,6 +354,7 @@ def submit_answer():
 
 @app.route("/joincourse")
 def joincourse():
+    permission_check("student")
     course_id = request.args.get("id")
     student_id = session["user_id"]
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
@@ -371,6 +369,7 @@ def joincourse():
 
 @app.route("/leavecourse")
 def leavecourse():
+    permission_check("student")
     course_id = request.args.get("id")
     student_id = session["user_id"]
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
