@@ -84,11 +84,10 @@ def coursetools():
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     courses_sql = """
-                  SELECT courses.id, name, credits, COUNT(course_participants.student_id) AS student_count, STRING_AGG(teacher_accounts.username, ', ') AS teacher_names
+                  SELECT courses.id, name, credits, COUNT(course_participants.student_id) AS student_count, (ARRAY_AGG(teacher_accounts.username)) AS teacher_name
                   FROM courses
                   LEFT JOIN course_participants ON courses.id = course_participants.course_id
-                  LEFT JOIN course_teachers ON courses.id = course_teachers.course_id
-                  LEFT JOIN teacher_accounts ON course_teachers.teacher_id = teacher_accounts.id
+                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
                   GROUP BY courses.id
                   ORDER BY name ASC
                   """
@@ -107,8 +106,8 @@ def createcourse():
         check_sql = "SELECT name FROM courses WHERE name = :course_name"
         if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
             return redirect(f"/coursetools?status=already_exists&name={course_name}")
-        sql = "INSERT INTO courses (name, credits) VALUES (:course_name, :credits)"
-        db.session.execute(text(sql), {"course_name": course_name, "credits": credits})
+        sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
+        db.session.execute(text(sql), {"course_name": course_name, "credits": credits, "teacher_id": session["user_id"]})
         db.session.commit()
         return redirect(f"/coursetools?status=success&name={course_name}")
 
@@ -295,7 +294,6 @@ def exercises_materials():
     course_id = request.args["id"]
     if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    student_in_course()
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
 
