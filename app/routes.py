@@ -99,13 +99,16 @@ def coursetools():
                     courses.id,
                     name,
                     credits,
-                    COUNT(course_participants.student_id) AS student_count,
-                    (STRING_AGG(teacher_accounts.username, ', ')) AS teacher_name
+                    p.student_count,
+                    teacher_accounts.username
                   FROM courses
-                  LEFT JOIN course_participants ON courses.id = course_participants.course_id
-                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
-                  GROUP BY courses.id
-                  ORDER BY name ASC
+                  JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
+                  JOIN (
+                    SELECT course_id, COUNT(student_id) AS student_count
+                    FROM course_participants
+                    GROUP BY course_id
+                    ) 
+                  p ON courses.id = p.course_id
                   """
     courses = db.session.execute(text(courses_sql)).fetchall()
     return render_template("coursetools.html", courses=courses)
@@ -277,23 +280,24 @@ def coursesview():
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     user_id = session["user_id"]
     courses_sql = """
-                  SELECT
-                   courses.id,
-                   courses.name,
-                   courses.credits,
-                   STRING_AGG(teacher_accounts.username, ', ') AS teacher_name,
-                   ARRAY_AGG(course_participants.student_id) AS student_ids
+                  SELECT 
+                    courses.id,
+                    name,
+                    credits,
+                    student_ids,
+                    teacher_accounts.username
                   FROM courses
-                  LEFT JOIN course_participants
-                   ON courses.id = course_participants.course_id
-                  LEFT JOIN teacher_accounts 
-                   ON courses.teacher_id = teacher_accounts.id
-                  GROUP BY courses.id
-                  ORDER BY name ASC
+                  JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
+                  JOIN (
+                    SELECT course_id, ARRAY_AGG(student_id) AS student_ids
+                    FROM course_participants
+                    GROUP BY course_id
+                    ) 
+                  p ON courses.id = p.course_id
                   """
     all_courses = db.session.execute(text(courses_sql)).fetchall()
-    own_courses = list(filter(lambda c: user_id in c[4], all_courses))
-    other_courses = list(filter(lambda c: user_id not in c[4], all_courses))
+    own_courses = list(filter(lambda c: user_id in c[3], all_courses))
+    other_courses = list(filter(lambda c: user_id not in c[3], all_courses))
     exercises_done_sql = """
                          SELECT course_id, COUNT(id) 
                          FROM exercise_answers

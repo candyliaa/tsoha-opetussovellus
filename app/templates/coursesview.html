@@ -27,7 +27,7 @@
         <tr>
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
-            <td>{{ course["teacher_name"] }}</td>
+            <td>{{ course["username"] }}</td>
             <td><a href="/leavecourse?id={{course['id']}}" style="color: red">Poistu kurssilta</a></td>
             <td><a href="/exercises_materials?id={{course['id']}}">Tehtävät ja materiaalit</a></td>
             {% if not course['id'] in total_exercises_dict.keys() %}
@@ -63,7 +63,7 @@
         <tr>
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
-            <td>{{ course["teacher_name"] }}</td>
+            <td>{{ course["username"] }}</td>
             <td><a href="/joincourse?id={{course['id']}}" style="color: green">Liity kurssille</a></td>
         </tr>
         {% endfor %}
