@@ -31,13 +31,14 @@
 {% if i % 5 == 0 %}
 <br>
 {% endif %}
-{% if exercises[i]["correct"] == True %}
+{% if submissions[exercises[i][0]] == True %}
 {% set col = "green" %}
-{% elif exercises[i]["correct"] == False %}
+{% elif submissions[exercises[i][0]] == False %}
 {% set col = "red" %}
 {% else %}
 {% set col = "orange" %}
 {% endif %}
+<!--Visual Studio Code shows an error here, although this code works-->
 <a style="color: {{ col }}" href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i]['id'] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
 {% endfor %}
 {% endif %}

@@ -332,20 +332,33 @@ def exercises_materials():
     materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
     
     student_id = session["user_id"]
+    print(f"student id: {student_id}")
+    print(f"course id: {course_id}")
     course_exercises_sql = """
                            SELECT 
                            exercises.id, 
                            question,
-                           choices,
-                           correct
+                           choices
                            FROM exercises
-                           LEFT JOIN exercise_answers ON
-                            exercises.id = exercise_answers.exercise_id
-                           WHERE exercises.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id, TRUE)
+                           WHERE exercises.course_id = :course_id
                            ORDER BY id
                            """
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
-    return render_template(f"/exercises_materials.html", course=course, exercises=course_exercises, materials=materials)
+    print(f"course exercises: {course_exercises}")
+    exercise_submissions_sql = """
+                               SELECT
+                               exercise_id,
+                               correct
+                               FROM exercise_answers
+                               WHERE exercise_answers.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id)
+                               """
+    exercise_submissions = db.session.execute(text(exercise_submissions_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+    print(f"exercise submissions: {exercise_submissions}")
+    submissions_dict = {}
+    for submission in exercise_submissions:
+        submissions_dict[submission[0]] = submission[1]
+    print(f"submissions_dict: {submissions_dict}")
+    return render_template(f"/exercises_materials.html", course=course, exercises=course_exercises, submissions=submissions_dict, materials=materials)
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
