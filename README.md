@@ -25,7 +25,7 @@ After that, launch the Docker Desktop application, and run
 ```
 $ docker compose up
 ```
-You can then open the app at `http://localhost:8000` .
+You can then open the app at [`http://localhost:8000`](http://localhost:8000) .
 
 # Current state of the app
 Although the app is mostly done functionality wise, the styling is still to be improved - both the look of the HTML pages, and the structure of the code (mostly moving things such as SQL -queries from the routes in `routes.py` to another file, for easier reading of routes.)
