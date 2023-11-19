@@ -200,7 +200,7 @@ def modifycourse():
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
-    course_id = request.args.get("id")
+    course_id = request.form["course_id"]
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if not correct_teacher(course_id):
@@ -364,7 +364,6 @@ def do_exercise():
     exercise_num = request.args["exercise_num"]
     exercise_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id AND id = :id"
     exercise = db.session.execute(text(exercise_sql), {"course_id": course_id, "id": exercise_id}).fetchone()
-    print(f"exercise: {exercise}")
     exercise_submission_sql = """
                                SELECT
                                answer,
@@ -376,7 +375,6 @@ def do_exercise():
                                 AND exercise_id = :exercise_id
                                """
     exercise_submission = db.session.execute(text(exercise_submission_sql), {"course_id": course_id, "student_id": session["user_id"], "exercise_id": exercise_id}).fetchone()
-    print(f"submission: {exercise_submission}")
     return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course, submission=exercise_submission)
 
 @app.route("/submit_answer", methods=["POST", "GET"])
