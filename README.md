@@ -31,6 +31,6 @@ You can then open the app at [`http://localhost:8000`](http://localhost:8000) .
 Although the app is mostly done functionality wise, the styling is still to be improved - both the look of the HTML pages, and the structure of the code (mostly moving things such as SQL -queries from the routes in `routes.py` to another file, for easier reading of routes.)
 
 There are also some potential bugs with displaying exercises and courses properly when there are multiple students in a course.
-Right now there is one such bug I'm aware of: if two students join the same course, and one of them does any exercise, that exercise doesn't show up for the other student. 
+~~Right now there is one such bug I'm aware of: if two students join the same course, and one of them does any exercise, that exercise doesn't show up for the other student.~~ Fixed, but there might be similar bugs.
 
 More validation checks for data submitted through forms need to be implemented, too - mainly getting rid of CSRF-vulnerabilities.
