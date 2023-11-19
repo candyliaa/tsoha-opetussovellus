@@ -296,7 +296,6 @@ def coursesview():
                   p ON courses.id = p.course_id
                   """
     all_courses = db.session.execute(text(courses_sql)).fetchall()
-    print(all_courses)
     own_courses = list(filter(lambda c: user_id in c[3], all_courses))
     other_courses = list(filter(lambda c: user_id not in c[3], all_courses))
     exercises_done_sql = """
@@ -332,8 +331,6 @@ def exercises_materials():
     materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
     
     student_id = session["user_id"]
-    print(f"student id: {student_id}")
-    print(f"course id: {course_id}")
     course_exercises_sql = """
                            SELECT 
                            exercises.id, 
@@ -344,7 +341,6 @@ def exercises_materials():
                            ORDER BY id
                            """
     course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
-    print(f"course exercises: {course_exercises}")
     exercise_submissions_sql = """
                                SELECT
                                exercise_id,
@@ -353,11 +349,9 @@ def exercises_materials():
                                WHERE exercise_answers.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id)
                                """
     exercise_submissions = db.session.execute(text(exercise_submissions_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
-    print(f"exercise submissions: {exercise_submissions}")
     submissions_dict = {}
     for submission in exercise_submissions:
         submissions_dict[submission[0]] = submission[1]
-    print(f"submissions_dict: {submissions_dict}")
     return render_template(f"/exercises_materials.html", course=course, exercises=course_exercises, submissions=submissions_dict, materials=materials)
 
 @app.route("/do_exercise", methods=["POST", "GET"])
@@ -370,7 +364,20 @@ def do_exercise():
     exercise_num = request.args["exercise_num"]
     exercise_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id AND id = :id"
     exercise = db.session.execute(text(exercise_sql), {"course_id": course_id, "id": exercise_id}).fetchone()
-    return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course)
+    print(f"exercise: {exercise}")
+    exercise_submission_sql = """
+                               SELECT
+                               answer,
+                               correct
+                               FROM exercise_answers
+                               WHERE 
+                                exercise_answers.course_id = :course_id 
+                                AND COALESCE(exercise_answers.student_id = :student_id) 
+                                AND exercise_id = :exercise_id
+                               """
+    exercise_submission = db.session.execute(text(exercise_submission_sql), {"course_id": course_id, "student_id": session["user_id"], "exercise_id": exercise_id}).fetchone()
+    print(f"submission: {exercise_submission}")
+    return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course, submission=exercise_submission)
 
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
