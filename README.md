@@ -1,42 +1,36 @@
 # tsoha-opetussovellus
+The current functionality of the app is as follows:
+- Users can create a student or a teacher account, which have different functionalities
+- Students can view all courses, join them, leave them, view text materials do exercises
+- Teachers can create courses, add exercises and text materials, delete exercises and delete courses
+- Exercises can be essay exercises or multiple choice exercises: Essay exercises upon submission are always correct, and the example answer is shown, while multiple choice questions can be correct or wrong
+- When viewing a course, students can see which exercises they have done and which they haven't, along with if they are correct or incorrect
+- Teachers can see which students have done which exercises, and if they are correct or incorrect
 
-Sovelluksen tavoitteena on sama toiminnallisuus kuin kurssin aiheista "opetussovellus" -aiheen ominaisuudet. 
-Tarkalleen ottaen:
--  Käyttäjätunnusten luonti ja kirjautuminen
--  Erilaisia käyttäjätyyppejä; oppilailla ja opettajilla on eri toiminnallisuus
-    - Opiskelijat voivat liittyä kursseille ja tehdä tehtäviä, sekä tarkastelemaan niiden tilannetta.
-    - Opettajat voivat luoda kursseja, luoda tehtäviä niihin, tarkastelemaan tehtävien tiloja ja poistamaan kursseja.
-
-# Tämänhetkinen toiminnallisuus
-Tällä hetkellä ohjelmalla pystyy:
-- Luoda käyttäjätilin
-- Kirjautua sisään
-- Opettajat voivat nähdä kaikki kurssit, niiden opettajan ja kuinka monta opiskelijaa kurssilla on
-- Opettajat voivat luoda kursseja sekä poistaa niitä
-- Opettajat voivat lisätä kurssille tehtäviä (tekstitehtävä tai monivalintatehtävä) sekä nähdä, ketkä opiskelijat ovat tehneet mitkä tehtävät
-- Opiskelijat voivat myös nähdä kaikki kurssit, liittyä niihin ja poistua niistä
-- Opiskelijat voivat tehdä tehtäviä ja saada palautteen, onko se oikein vai väärin
-
-# Ohjelman käynnistys
-Kloonaa ensin tämä repositorio:
+# Running the app
+First, clone the repository:
 ```
-$ git clone https://github.com/candyliaa/tsoha-opetussovellus
-``` 
-Projektissa käytetään [Docker](https://www.docker.com/) -ohjelmaa. Asenna se omalle tietokoneellesi [täältä](https://docs.docker.com/get-docker/).
-Opas Dockerin käyttöön Python web-applikaation kanssa löytyy [täältä](https://docs.docker.com/compose/gettingstarted/).
-
-Muuta `compose.yaml.example` -tiedoston nimeksi `compose.yaml` ja sijoita `SECRET_KEY` -kenttään salainen avain. Voit luoda salaisen avaimen seuraavasti:
+git clone https://github.com/candyliaa/tsoha-opetussovellus
+```
+You can run the app with [Docker](https://www.docker.com/). You can install it [here](https://docs.docker.com/get-docker/).
+The structure of the Docker containers follows [this](https://docs.docker.com/compose/gettingstarted/) guide.
+To run the app yourself, generate a secret key: 
 ```
 $ python3
 >>> import secrets
 >>> secrets.token_hex(16)
 ```
-Docker huolehtii projektissa käytetyistä paketeista ja tietokannasta. Voit käynnistää ohjelman seuraavalla komennolla:
+and replace `KEY GOES HERE` in `compose.yaml.example` with the key you just generated.
+After that, launch the Docker Desktop application, and run
 ```
 $ docker compose up
 ```
-Voit sen jälkeen avata ohjelman osoitteessa http://localhost:8000 .
+You can then open the app at `http://localhost:8000` .
 
-Jos haluat nähdä, mitä paketteja ohjelmassa käytetään, ne löytyy `requirements.txt` -tiedostosta hakemistosta `app`.
-`db` -hakemistossa olevassa `test_data.sql` -tiedostossa on dataa, jonka avulla ohjelmaa voi testata. Sieltä löytyy käyttäjätilien tiedot.
-Tietokannan rakennetta voi tarkastella `schema.sql` -tiedostossa, joka on hakemistossa `db`.
+# Current state of the app
+Although the app is mostly done functionality wise, the styling is still to be improved - both the look of the HTML pages, and the structure of the code (mostly moving things such as SQL -queries from the routes in `routes.py` to another file, for easier reading of routes.)
+
+There are also some potential bugs with displaying exercises and courses properly when there are multiple students in a course.
+Right now there is one such bug I'm aware of: if two students join the same course, and one of them does any exercise, that exercise doesn't show up for the other student. 
+
+More validation checks for data submitted through forms need to be implemented, too - mainly getting rid of CSRF-vulnerabilities.
