@@ -20,7 +20,7 @@ $ python3
 >>> import secrets
 >>> secrets.token_hex(16)
 ```
-and replace `KEY GOES HERE` in `compose.yaml.example` with the key you just generated.
+and replace `KEY GOES HERE` in `compose.yaml.example` with the key you just generated. Then rename `compose.yaml.example` to just `compose.yaml`.
 After that, launch the Docker Desktop application, and run
 ```
 $ docker compose up
