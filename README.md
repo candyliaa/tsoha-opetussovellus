@@ -10,7 +10,7 @@ The current functionality of the app is as follows:
 # Running the app
 First, clone the repository:
 ```
-git clone https://github.com/candyliaa/tsoha-opetussovellus
+git clone https://github.com/candyliaa/tsoha-opetussovellus.git
 ```
 You can run the app with [Docker](https://www.docker.com/). You can install it [here](https://docs.docker.com/get-docker/).
 The structure of the Docker containers follows [this](https://docs.docker.com/compose/gettingstarted/) guide.
