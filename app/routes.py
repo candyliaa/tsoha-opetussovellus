@@ -1,6 +1,6 @@
 """File containing all routes."""
 import secrets
-from flask import render_template, request, redirect, session
+from flask import render_template, request, redirect, session, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import text
 import data
@@ -80,7 +80,7 @@ def coursetools():
 @app.route("/createcourse", methods=["POST"])
 def createcourse():
     """Create a course and add it to the database."""
-    if request.form["csrf_token"] != session["csrf_token"]:
+    if not data.csrf_token_check:
         abort(403)
     if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -286,6 +286,8 @@ def exercises_materials():
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
     """Page for submitting answers to exercises, and inserting into the database."""
+    if not data.csrf_token_check:
+        abort(403)
     course_id = request.args["course_id"]
     if not data.permission_check(session, "student") or not data.student_in_course(
         session, course_id

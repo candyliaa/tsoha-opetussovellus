@@ -48,6 +48,11 @@ def correct_teacher(session: dict, course_id: str):
         return False
     return True
 
+def csrf_token_check(session: dict, form_token: str):
+    """Check if the csrf token of the current user session matches the form's csrf token."""
+    if session["csrf_token"] != form_token:
+        return False
+    return True
 
 # Login and account creation functions
 def login_fetch_user(account_type: str, username: str):
