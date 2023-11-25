@@ -443,13 +443,17 @@ def already_in_course(student_id: int, course_id: int):
         return False
     return True
 
-
-def join_course(student_id: int, course_id: int):
-    """Insert data into the database upon joining a course."""
+def course_name_by_id(course_id: int):
+    """Fetch the name of a course by its id."""
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(
         text(course_name_sql), {"course_id": course_id}
     ).fetchone()[0]
+    return course_name
+
+def join_course(student_id: int, course_id: int):
+    """Insert data into the database upon joining a course."""
+    course_name = course_name_by_id(course_id)
     course_join_sql = """
                     INSERT INTO course_participants (course_id, student_id)
                     VALUES (:course_id, :student_id)
@@ -463,10 +467,7 @@ def join_course(student_id: int, course_id: int):
 
 def leave_course(student_id: int, course_id: int):
     """Remove data from the database when a student leaves a course."""
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(
-        text(course_name_sql), {"course_id": course_id}
-    ).fetchone()[0]
+    course_name = course_name_by_id(course_id)
     leave_course_sql = """
                        DELETE FROM course_participants
                        WHERE student_id = :student_id
