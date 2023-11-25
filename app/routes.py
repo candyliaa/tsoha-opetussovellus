@@ -5,38 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import text
 from app import app
 from db import db
-
-def permission_check(role = None):
-    """Check if user has the correct role to access webpage."""
-    if "role" not in session.keys() or session["role"] != role:
-        return False
-    return True
-
-def student_in_course(course_id: str):
-    """Check if a student is enrolled in a course before they can view it."""
-    student_id = session["user_id"]
-    student_in_course_check_sql = """
-                                  SELECT student_id
-                                  FROM course_participants
-                                  WHERE student_id = :student_id AND course_id = :course_id
-                                  """
-    if db.session.execute(text(student_in_course_check_sql),
-    {"student_id": student_id, "course_id": course_id}).fetchone() is None:
-        return False
-    return True
-
-def correct_teacher(course_id: str):
-    """Check if the user is the teacher of the class they're trying to modify."""
-    teacher_id = session["user_id"]
-    correct_teacher_check_sql = """
-                                SELECT teacher_id
-                                FROM courses
-                                WHERE courses.id = :course_id
-                                """
-    if db.session.execute(text(correct_teacher_check_sql),
-    {"course_id": course_id}).fetchone()[0] != teacher_id:
-        return False
-    return True
+import data
 
 @app.route("/")
 def index():
@@ -81,15 +50,10 @@ def accountcreated():
     password = request.form["password"]
     hash_value = generate_password_hash(password)
     account_type = request.form["role"]
-    if account_type == "teacher":
-        sql = "INSERT INTO teacher_accounts (username, password) VALUES (:username, :password) RETURNING id"
-    else:
-        sql = "INSERT INTO student_accounts (username, password) VALUES (:username, :password) RETURNING id"
-    return_value = db.session.execute(text(sql), {"username": username, "password": hash_value})
-    db.session.commit()
+    user_id = data.create_account(account_type, username, hash_value)
     session["username"] = username
     session["role"] = account_type
-    session["user_id"] = return_value.fetchone()[0]
+    session["user_id"] = user_id
     return render_template("accountcreated.html", username=request.form["username"])
 
 @app.route("/logout")
@@ -103,7 +67,7 @@ def logout():
 @app.route("/coursetools", methods=["POST", "GET"])
 def coursetools():
     """Show teachers a page to view all courses."""
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     courses_sql = """
                   SELECT 
@@ -127,7 +91,7 @@ def coursetools():
 @app.route("/createcourse", methods=["POST"])
 def createcourse():
     """Create a course and add it to the database."""
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
         course_name = request.form["course_name"]
@@ -146,9 +110,9 @@ def createcourse():
 def deletecourse():
     """Remove a course from the database."""
     course_id = request.args.get("id")
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not correct_teacher(course_id):
+    if not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
@@ -161,9 +125,9 @@ def deletecourse():
 def modifycourse():
     """Add or exercises or text materials, or remove exercises."""
     course_id = request.args.get("id")
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not correct_teacher(course_id):
+    if not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
@@ -216,9 +180,9 @@ def modifycourse():
 def addtextmaterial():
     """Add text materials and insert into the database."""
     course_id = request.form["course_id"]
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not correct_teacher(course_id):
+    if not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.form["course_id"]
     title = request.form["title"]
@@ -235,9 +199,9 @@ def addtextmaterial():
 def exercisecreated():
     """Create an exercise of the user's choosing and insert into the database."""
     course_id = request.form["course_id"]
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not correct_teacher(course_id):
+    if not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
         if request.form["exercise_type"] == "text_question":
@@ -261,7 +225,7 @@ def exercisecreated():
             choice4 = request.form["choice4"]
             choices = [choice1, choice2, choice3, choice4]
             correct_answer = request.form["correct_answer"]
-            
+
             choices_dict = {}
             choices_dict["choices"] = choices
             choices_dict["correct_answer"] = correct_answer
@@ -278,9 +242,9 @@ def exercisecreated():
 def delete_exercise():
     """Delete the chosen exercise and remove it from the database."""
     course_id = request.args.get("course_id")
-    if not permission_check("teacher"):
+    if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not correct_teacher(course_id):
+    if not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     exercise_id = request.args.get("exercise_id")
     delete_exercise_sql = """
@@ -294,7 +258,7 @@ def delete_exercise():
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
     """Display a page for students to view all courses."""
-    if not permission_check("student"):
+    if not data.permission_check(session, "student"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     user_id = session["user_id"]
     courses_sql = """
@@ -341,7 +305,8 @@ def coursesview():
 def exercises_materials():
     """Display the exercises and materials for the given course."""
     course_id = request.args["id"]
-    if not permission_check("student") or not student_in_course(course_id):
+    if not data.permission_check(session, "student") \
+    or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
     course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
@@ -377,7 +342,8 @@ def exercises_materials():
 def do_exercise():
     """Page for submitting answers to exercises, and inserting into the database."""
     course_id = request.args["course_id"]
-    if not permission_check("student") or not student_in_course(course_id):
+    if not data.permission_check(session, "student") \
+    or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course = db.session.execute(text("SELECT id, name FROM courses WHERE id = :course_id"), {"course_id": course_id}).fetchone()
     exercise_id = request.args["exercise_id"]
@@ -401,7 +367,8 @@ def do_exercise():
 def submit_answer():
     """Check if there's already a submission for the exercise, then insert into the database."""
     course_id = request.form["course_id"]
-    if not permission_check("student") or not student_in_course(course_id):
+    if not data.permission_check(session, "student") \
+    or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     answer = request.form["answer"]
     student_id = session["user_id"]
@@ -441,7 +408,7 @@ def submit_answer():
 @app.route("/joincourse")
 def joincourse():
     """Join a course and insert data accordingly to the database."""
-    if not permission_check("student"):
+    if not data.permission_check(session, "student"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args.get("id")
     student_id = session["user_id"]
@@ -459,7 +426,8 @@ def joincourse():
 def leavecourse():
     """Leave a course and remove relevant data from the database."""
     course_id = request.args.get("id")
-    if not permission_check("student") or not student_in_course(course_id):
+    if not data.permission_check(session, "student") \
+    or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     student_id = session["user_id"]
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
