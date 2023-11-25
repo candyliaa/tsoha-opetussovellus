@@ -6,18 +6,22 @@ import data
 from app import app
 from db import db
 
+
 @app.route("/")
 def index():
     """Return the main page for the user."""
     return render_template("index.html")
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Route logic for logging in."""
     if request.method == "POST":
-        if not "username" in request.form \
-        or "password" not in request.form \
-        or "role" not in request.form:
+        if (
+            not "username" in request.form
+            or "password" not in request.form
+            or "role" not in request.form
+        ):
             return redirect("/login?failed=1")
         username = request.form["username"]
         password = request.form["password"]
@@ -37,6 +41,7 @@ def login():
     else:
         return render_template("login.html")
 
+
 @app.route("/accountcreated", methods=["POST"])
 def accountcreated():
     """Create an account and insert into the database."""
@@ -50,6 +55,7 @@ def accountcreated():
     session["user_id"] = user_id
     return render_template("accountcreated.html", username=request.form["username"])
 
+
 @app.route("/logout")
 def logout():
     """Delete current session values upon logging out."""
@@ -58,6 +64,7 @@ def logout():
     del session["user_id"]
     return redirect("/")
 
+
 @app.route("/coursetools", methods=["POST", "GET"])
 def coursetools():
     """Show teachers a page to view all courses."""
@@ -65,6 +72,7 @@ def coursetools():
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     courses = data.coursetools_courses()
     return render_template("coursetools.html", courses=courses)
+
 
 @app.route("/createcourse", methods=["POST"])
 def createcourse():
@@ -82,24 +90,28 @@ def createcourse():
             data.create_course(course_name, course_credits, session)
             return redirect(f"/coursetools?status=success&name={course_name}")
 
+
 @app.route("/deletecourse")
 def deletecourse():
     """Remove a course from the database."""
     course_id = request.args.get("id")
-    if not data.permission_check(session, "teacher") \
-    or not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or not data.correct_teacher(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if not data.check_if_course_deletable:
         return redirect("/coursetools?status=course_not_deletable")
     course_name = data.delete_course(course_id)
     return redirect(f"/coursetools?status=deleted&name={course_name}")
 
+
 @app.route("/modifycourse", methods=["POST", "GET"])
 def modifycourse():
     """Add or exercises or text materials, or remove exercises."""
     course_id = request.args.get("id")
-    if not data.permission_check(session, "teacher") or \
-    not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or not data.correct_teacher(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
 
     course_data = data.modify_course_data(course_id)
@@ -117,8 +129,7 @@ def modifycourse():
     for exercise in course_exercises:
         exercise_submission = {}
         all_submissions = db.session.execute(
-            text(current_exercise_submissions_sql),
-            {"exercise_id": exercise[0]}
+            text(current_exercise_submissions_sql), {"exercise_id": exercise[0]}
         ).fetchall()
         all_submissions_dict = {}
         for submission in all_submissions:
@@ -134,18 +145,22 @@ def modifycourse():
             elif not all_submissions_dict[student[0]]:
                 exercise_submission[student[0]]["state"] = "incorrect"
         submissions.append(exercise_submission)
-    return render_template("/modifycourse.html",
-    course=course,
-    exercises=exercises,
-    materials=course_materials,
-    submissions=submissions)
+    return render_template(
+        "/modifycourse.html",
+        course=course,
+        exercises=exercises,
+        materials=course_materials,
+        submissions=submissions,
+    )
+
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
     """Add text materials and insert into the database."""
     course_id = request.form["course_id"]
-    if not data.permission_check(session, "teacher") or \
-    not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or not data.correct_teacher(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
 
     course_id = request.form["course_id"]
@@ -154,12 +169,14 @@ def addtextmaterial():
     data.add_material(course_id, title, body)
     return redirect(f"/modifycourse?id={course_id}&status=material_added")
 
+
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
     """Create an exercise of the user's choosing and insert into the database."""
     course_id = request.form["course_id"]
-    if not data.permission_check(session, "teacher") or \
-    not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or not data.correct_teacher(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
         exercise_type = request.form["exercise_type"]
@@ -182,15 +199,19 @@ def exercisecreated():
             choices_dict = {}
             choices_dict["choices"] = choices
             choices_dict["correct_answer"] = correct_answer
-            data.create_exercise(course_id, question, correct_answer, exercise_type, choices_dict)
+            data.create_exercise(
+                course_id, question, correct_answer, exercise_type, choices_dict
+            )
         return redirect(f"/modifycourse?id={course_id}&status=exercise_added")
+
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
 def delete_exercise():
     """Delete the chosen exercise and remove it from the database."""
     course_id = request.args.get("course_id")
-    if not data.permission_check(session, "teacher") or \
-    not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or not data.correct_teacher(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
 
     exercise_id = request.args.get("exercise_id")
@@ -198,6 +219,7 @@ def delete_exercise():
         return redirect(f"/modifycourse?id={course_id}status=remove_failed")
     data.delete_exercise(course_id, exercise_id)
     return redirect(f"/modifycourse?id={course_id}&status=exercise_removed")
+
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
@@ -219,19 +241,22 @@ def coursesview():
     total_exercises_dict = {}
     for course in total_exercises:
         total_exercises_dict[course[0]] = course[1]
-    return render_template("/coursesview.html",
-    own_courses=own_courses,
-    other_courses=other_courses,
-    exercises_done_dict=exercises_done_dict,
-    total_exercises_dict=total_exercises_dict
+    return render_template(
+        "/coursesview.html",
+        own_courses=own_courses,
+        other_courses=other_courses,
+        exercises_done_dict=exercises_done_dict,
+        total_exercises_dict=total_exercises_dict,
     )
+
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
     """Display the exercises and materials for the given course."""
     course_id = request.args["id"]
-    if not data.permission_check(session, "student") \
-    or not data.student_in_course(session, course_id):
+    if not data.permission_check(session, "student") or not data.student_in_course(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
 
     course_data = data.exercises_and_materials(course_id, session)
@@ -244,19 +269,22 @@ def exercises_materials():
     for submission in exercise_submissions:
         submissions_dict[submission[0]] = submission[1]
 
-    return render_template("/exercises_materials.html",
-    course=course,
-    exercises=course_exercises,
-    submissions=submissions_dict,
-    materials=course_materials
+    return render_template(
+        "/exercises_materials.html",
+        course=course,
+        exercises=course_exercises,
+        submissions=submissions_dict,
+        materials=course_materials,
     )
+
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
     """Page for submitting answers to exercises, and inserting into the database."""
     course_id = request.args["course_id"]
-    if not data.permission_check(session, "student") \
-    or not data.student_in_course(session, course_id):
+    if not data.permission_check(session, "student") or not data.student_in_course(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     exercise_id = request.args["exercise_id"]
     exercise_num = request.args["exercise_num"]
@@ -266,19 +294,22 @@ def do_exercise():
     course = exercise_data["course"]
     exercise_submission = exercise_data["exercise_submission"]
 
-    return render_template("/do_exercise.html",
-    exercise=exercise,
-    course=course,
-    exercise_num=exercise_num,
-    submission=exercise_submission
+    return render_template(
+        "/do_exercise.html",
+        exercise=exercise,
+        course=course,
+        exercise_num=exercise_num,
+        submission=exercise_submission,
     )
+
 
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
     """Check if there's already a submission for the exercise, then insert into the database."""
     course_id = request.form["course_id"]
-    if not data.permission_check(session, "student") \
-    or not data.student_in_course(session, course_id):
+    if not data.permission_check(session, "student") or not data.student_in_course(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     answer = request.form["answer"]
     student_id = session["user_id"]
@@ -286,10 +317,16 @@ def submit_answer():
     exercise_type = request.form["exercise_type"]
     exercise_num = request.form["exercise_num"]
     if not data.submission_exists(answer, student_id, course_id, exercise_id):
-        return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={False}")
+        return redirect(
+            f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={False}"
+        )
 
-    exercise_sql = "SELECT id, choices, course_id FROM exercises WHERE id = :exercise_id"
-    exercise = db.session.execute(text(exercise_sql), {"exercise_id": exercise_id}).fetchone()
+    exercise_sql = (
+        "SELECT id, choices, course_id FROM exercises WHERE id = :exercise_id"
+    )
+    exercise = db.session.execute(
+        text(exercise_sql), {"exercise_id": exercise_id}
+    ).fetchone()
     if exercise_type == "text_exercise":
         if len(request.form["answer"]) >= 50:
             status = True
@@ -299,7 +336,10 @@ def submit_answer():
         else:
             status = False
     data.submit_exercise(student_id, course_id, exercise_id, answer, status)
-    return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}&show_answer={True}")
+    return redirect(
+        f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}&show_answer={True}"
+    )
+
 
 @app.route("/joincourse")
 def joincourse():
@@ -314,12 +354,14 @@ def joincourse():
         course_name = data.join_course(student_id, course_id)
     return redirect(f"/coursesview?status=joined&name={course_name}")
 
+
 @app.route("/leavecourse")
 def leavecourse():
     """Leave a course and remove relevant data from the database."""
     course_id = request.args.get("id")
-    if not data.permission_check(session, "student") \
-    or not data.student_in_course(session, course_id):
+    if not data.permission_check(session, "student") or not data.student_in_course(
+        session, course_id
+    ):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     student_id = session["user_id"]
     course_name = data.leave_course(student_id, course_id)
