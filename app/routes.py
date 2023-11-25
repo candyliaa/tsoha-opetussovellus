@@ -80,6 +80,8 @@ def coursetools():
 @app.route("/createcourse", methods=["POST"])
 def createcourse():
     """Create a course and add it to the database."""
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
     if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
