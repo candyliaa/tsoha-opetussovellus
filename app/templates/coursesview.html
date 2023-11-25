@@ -8,7 +8,9 @@
 {% endif %}
 
 {% if request.args.get("status") == "joined" %}
-<p>Liityit kurssille {{ request.args.get("name") }}.</p>
+<b>Liityit kurssille {{ request.args.get("name") }}.</b>
+{% elif request.args.get("status") == "failed" %}
+<b>Et voinut liittyä kurssille, koska olet jo kurssilla!</b>
 {% endif %}
 
 {% if own_courses|length == 0 %}
