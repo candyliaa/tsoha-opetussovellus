@@ -12,4 +12,4 @@ INSERT INTO courses (name, credits, teacher_id) VALUES ('ohpe', 5, 1);
 
 INSERT INTO course_participants(course_id, student_id) VALUES (1, 1);
 
-INSERT INTO exercises (question, choices, course_id) VALUES ('Kuinka paljon on 1+2?', '3', 1)
+INSERT INTO exercises (question, choices, course_id) VALUES ('Mikä on elämän merkitys?', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 1)
