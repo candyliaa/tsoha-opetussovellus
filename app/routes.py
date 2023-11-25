@@ -145,41 +145,28 @@ def addtextmaterial():
     if not data.permission_check(session, "teacher") or \
     not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+
     course_id = request.form["course_id"]
     title = request.form["title"]
     body = request.form["body"]
-    add_material_sql = """
-                       INSERT INTO text_materials (title, body, course_id)
-                       VALUES (:title, :body, :course_id)
-                       """
-    db.session.execute(
-        text(add_material_sql),
-        {"title": title, "body": body, "course_id": course_id}
-    )
-    db.session.commit()
+    data.add_material(course_id, title, body)
     return redirect(f"/modifycourse?id={course_id}&status=material_added")
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
     """Create an exercise of the user's choosing and insert into the database."""
     course_id = request.form["course_id"]
-    if not data.permission_check(session, "teacher"):
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or \
+    not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
-        if request.form["exercise_type"] == "text_question":
+        exercise_type = request.form["exercise_type"]
+        if exercise_type == "text_question":
             course_id = request.form["course_id"]
             question = request.form["question"]
             example_answer = request.form["example_answer"]
-            example_answer = json.dumps(example_answer)
-            add_exercise_sql = """
-                               INSERT INTO exercises (question, choices, course_id)
-                               VALUES (:question, :choices, :course_id)
-                               """
-            db.session.execute(text(add_exercise_sql), {"question": question, "choices": example_answer, "course_id": course_id})
-            db.session.commit()
-        elif request.form["exercise_type"] == "multiple_choice":
+            data.create_exercise(course_id, question, example_answer, exercise_type)
+        elif exercise_type == "multiple_choice":
             question = request.form["question"]
             course_id = request.form["course_id"]
 
@@ -193,16 +180,7 @@ def exercisecreated():
             choices_dict = {}
             choices_dict["choices"] = choices
             choices_dict["correct_answer"] = correct_answer
-            choices_dict = json.dumps(choices_dict)
-            add_exercise_sql = """
-                               INSERT INTO exercises (question, choices, course_id)
-                               VALUES (:question, :choices, :course_id)
-                               """
-            db.session.execute(
-                text(add_exercise_sql),
-                {"question": question, "choices": choices_dict, "course_id": course_id}
-            )
-            db.session.commit()
+            data.create_exercise(course_id, question, example_answer, exercise_type, choices_dict)
         return redirect(f"/modifycourse?id={course_id}&status=exercise_added")
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
@@ -276,7 +254,7 @@ def exercises_materials():
 
     materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
     materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
-    
+
     student_id = session["user_id"]
     course_exercises_sql = """
                            SELECT 

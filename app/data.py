@@ -1,4 +1,5 @@
 """File that contains helper functions for routes.py."""
+import json
 from sqlalchemy.sql import text
 from db import db
 
@@ -50,7 +51,10 @@ def create_account(account_type: str, username: str, hash_value: str):
         sql = "INSERT INTO teacher_accounts (username, password) VALUES (:username, :password) RETURNING id"
     else:
         sql = "INSERT INTO student_accounts (username, password) VALUES (:username, :password) RETURNING id"
-    return_value = db.session.execute(text(sql), {"username": username, "password": hash_value}).fetchone()
+    return_value = db.session.execute(
+        text(sql),
+        {"username": username, "password": hash_value}
+    ).fetchone()
     db.session.commit()
     return return_value[0]
 
@@ -81,7 +85,10 @@ def create_course(course_name: str, course_credits: int, session: dict):
     if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
         return False
     sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
-    db.session.execute(text(sql), {"course_name": course_name, "credits": course_credits, "teacher_id": session["user_id"]})
+    db.session.execute(
+        text(sql),
+        {"course_name": course_name, "credits": course_credits, "teacher_id": session["user_id"]}
+    )
     db.session.commit()
 
 def delete_course(course_id: int):
@@ -98,13 +105,22 @@ def delete_course(course_id: int):
 def modify_course_data(course_id: int):
     """Return relevant data the modify_course route uses."""
     course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
-    course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
+    course = db.session.execute(
+        text(course_sql),
+        {"course_id": course_id}
+    ).fetchone()
 
     materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
-    materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
+    materials = db.session.execute(
+        text(materials_sql),
+        {"course_id": course_id}
+    ).fetchall()
 
-    course_exercises_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id ORDER BY id"                     
-    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
+    course_exercises_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id ORDER BY id"
+    course_exercises = db.session.execute(
+        text(course_exercises_sql),
+        {"course_id": course_id}
+    ).fetchall()
 
     course_participants_sql = """
                               SELECT id, username
@@ -113,7 +129,10 @@ def modify_course_data(course_id: int):
                               ON course_participants.student_id = student_accounts.id
                               WHERE course_id = :course_id
                               """
-    course_participants = db.session.execute(text(course_participants_sql), {"course_id": course_id}).fetchall()
+    course_participants = db.session.execute(
+        text(course_participants_sql),
+        {"course_id": course_id}
+    ).fetchall()
 
     current_exercise_submissions_sql = """
                                     SELECT student_id, correct
@@ -130,6 +149,43 @@ def modify_course_data(course_id: int):
 
     return data_dict
 
+def add_material(course_id: int, title: str, body: str):
+    """Insert text material into the database."""
+    add_material_sql = """
+                       INSERT INTO text_materials (title, body, course_id)
+                       VALUES (:title, :body, :course_id)
+                       """
+    db.session.execute(
+        text(add_material_sql),
+        {"title": title, "body": body, "course_id": course_id}
+    )
+    db.session.commit()
+
+def create_exercise(course_id: int, question: str, example_answer, exercise_type: str, choices_dict = None):
+    """Add exercise into the database upon creation."""
+    if exercise_type == "text_exercise":
+        example_answer = json.dumps(example_answer)
+        add_exercise_sql = """
+                            INSERT INTO exercises (question, choices, course_id)
+                            VALUES (:question, :choices, :course_id)
+                            """
+        db.session.execute(
+            text(add_exercise_sql),
+            {"question": question, "choices": example_answer, "course_id": course_id}
+        )
+        db.session.commit()
+    else:
+        choices_dict = json.dumps(choices_dict)
+        add_exercise_sql = """
+                            INSERT INTO exercises (question, choices, course_id)
+                            VALUES (:question, :choices, :course_id)
+                            """
+        db.session.execute(
+            text(add_exercise_sql),
+            {"question": question, "choices": choices_dict, "course_id": course_id}
+        )
+        db.session.commit()
+
 def delete_exercise(course_id: int, exercise_id: int):
     """Remove exercise from database upon deletion."""
     fetch_exercise_sql = """
@@ -139,9 +195,9 @@ def delete_exercise(course_id: int, exercise_id: int):
                          """
     if db.session.execute( \
         text(fetch_exercise_sql), \
-        {"course_id": course_id, "exercise_id": exericse_id} \
+        {"course_id": course_id, "exercise_id": exercise_id} \
         ).fetchone()[0] is None:
-            return False
+        return False
 
     delete_exercise_sql = """
                         DELETE FROM exercises
