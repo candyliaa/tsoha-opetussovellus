@@ -324,6 +324,26 @@ def fetch_exercise_data(course_id: int, exercise_id: int, session: dict):
 
     return data_dict
 
+def submission_exists(answer, student_id, course_id, exercise_id):
+    """Check if the student has already submitted an answer to the exercise."""
+    check_if_answer_exists_sql = """
+                                 SELECT answer, student_id, course_id, exercise_id
+                                 FROM exercise_answers
+                                 WHERE student_id = :student_id AND course_id = :course_id AND exercise_id = :exercise_id
+                                 """
+    result = db.session.execute(text(check_if_answer_exists_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id}).fetchone()
+    if result is not None:
+        return False
+
+def submit_exercise(student_id: int, course_id: int, exercise_id: int, answer, status: bool):
+    """Add submission data to the database when a user submits an exercise."""    
+    add_exercise_sql = """
+                    INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
+                    VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
+                    """
+    db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": status})
+    db.session.commit()
+
 def join_course(student_id: int, course_id: int):
     """Check if student is already in course and insert data into the database upon joining a course."""
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"

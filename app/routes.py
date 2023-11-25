@@ -281,24 +281,11 @@ def submit_answer():
     exercise_id = request.form["exercise_id"]
     exercise_type = request.form["exercise_type"]
     exercise_num = request.form["exercise_num"]
+    if not data.submission_exists(answer, student_id, course_id, exercise_id):
+        return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={False}")
 
     exercise_sql = "SELECT id, choices, course_id FROM exercises WHERE id = :exercise_id"
     exercise = db.session.execute(text(exercise_sql), {"exercise_id": exercise_id}).fetchone()
-
-    check_if_answer_exists_sql = """
-                                 SELECT answer, student_id, course_id, exercise_id
-                                 FROM exercise_answers
-                                 WHERE student_id = :student_id AND course_id = :course_id AND exercise_id = :exercise_id
-                                 """
-    result = db.session.execute(text(check_if_answer_exists_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id}).fetchone()
-    if result is not None:
-        status = "already_submitted"
-        return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}")
-
-    add_exercise_sql = """
-                       INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
-                       VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
-                       """
     if exercise_type == "text_exercise":
         if len(request.form["answer"]) >= 50:
             status = True
@@ -307,8 +294,7 @@ def submit_answer():
             status = True
         else:
             status = False
-    db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": status})
-    db.session.commit()
+    data.submit_exercise(student_id, course_id, exercise_id, answer, status)
     return redirect(f"/do_exercise?course_id={course_id}&exercise_id={exercise_id}&exercise_num={exercise_num}&status={status}&show_answer={True}")
 
 @app.route("/joincourse")
