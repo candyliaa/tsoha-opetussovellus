@@ -1,45 +1,55 @@
-from app import app
+"""File containing all routes."""
+import json
 from flask import render_template, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
-from db import db
 from sqlalchemy.sql import text
-import json
+from app import app
+from db import db
 
 def permission_check(role = None):
+    """Check if user has the correct role to access webpage."""
     if "role" not in session.keys() or session["role"] != role:
         return False
     return True
 
 def student_in_course(course_id: str):
+    """Check if a student is enrolled in a course before they can view it."""
     student_id = session["user_id"]
     student_in_course_check_sql = """
                                   SELECT student_id
                                   FROM course_participants
                                   WHERE student_id = :student_id AND course_id = :course_id
                                   """
-    if db.session.execute(text(student_in_course_check_sql), {"student_id": student_id, "course_id": course_id}).fetchone() is None:
+    if db.session.execute(text(student_in_course_check_sql),
+    {"student_id": student_id, "course_id": course_id}).fetchone() is None:
         return False
     return True
 
 def correct_teacher(course_id: str):
+    """Check if the user is the teacher of the class they're trying to modify."""
     teacher_id = session["user_id"]
     correct_teacher_check_sql = """
                                 SELECT teacher_id
                                 FROM courses
                                 WHERE courses.id = :course_id
                                 """
-    if db.session.execute(text(correct_teacher_check_sql), {"course_id": course_id}).fetchone()[0] != teacher_id:
+    if db.session.execute(text(correct_teacher_check_sql),
+    {"course_id": course_id}).fetchone()[0] != teacher_id:
         return False
     return True
 
 @app.route("/")
 def index():
+    """Return the main page for the user."""
     return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Route logic for logging in."""
     if request.method == "POST":
-        if not "username" in request.form or "password" not in request.form or "role" not in request.form:
+        if not "username" in request.form \
+        or "password" not in request.form \
+        or "role" not in request.form:
             return redirect("/login?failed=1")
         username = request.form["username"]
         password = request.form["password"]
@@ -55,10 +65,10 @@ def login():
         else:
             hash_value = user.password
             if check_password_hash(hash_value, password):
-                    session["username"] = username
-                    session["role"] = account_type
-                    session["user_id"] = user[0]
-                    return redirect("/")
+                session["username"] = username
+                session["role"] = account_type
+                session["user_id"] = user[0]
+                return redirect("/")
             else:
                 return redirect("/login?failed=2")
     else:
@@ -66,8 +76,7 @@ def login():
 
 @app.route("/accountcreated", methods=["POST"])
 def accountcreated():
-    if not permission_check():
-        return render_template("error.html", error="Et ole luonut tiliä!")
+    """Create an account and insert into the database."""
     username = request.form["username"]
     password = request.form["password"]
     hash_value = generate_password_hash(password)
@@ -85,6 +94,7 @@ def accountcreated():
 
 @app.route("/logout")
 def logout():
+    """Delete current session values upon logging out."""
     del session["username"]
     del session["role"]
     del session["user_id"]
@@ -92,6 +102,7 @@ def logout():
 
 @app.route("/coursetools", methods=["POST", "GET"])
 def coursetools():
+    """Show teachers a page to view all courses."""
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     courses_sql = """
@@ -115,23 +126,25 @@ def coursetools():
 
 @app.route("/createcourse", methods=["POST"])
 def createcourse():
+    """Create a course and add it to the database."""
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     if request.method == "POST":
         course_name = request.form["course_name"]
-        credits = int(request.form["credits"])
+        course_credits = int(request.form["credits"])
         if len(course_name) < 1 or credits < 1:
             return redirect("/coursetools?status=fail")
         check_sql = "SELECT name FROM courses WHERE name = :course_name"
         if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
             return redirect(f"/coursetools?status=already_exists&name={course_name}")
         sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
-        db.session.execute(text(sql), {"course_name": course_name, "credits": credits, "teacher_id": session["user_id"]})
+        db.session.execute(text(sql), {"course_name": course_name, "credits": course_credits, "teacher_id": session["user_id"]})
         db.session.commit()
         return redirect(f"/coursetools?status=success&name={course_name}")
 
 @app.route("/deletecourse")
 def deletecourse():
+    """Remove a course from the database."""
     course_id = request.args.get("id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -146,6 +159,7 @@ def deletecourse():
 
 @app.route("/modifycourse", methods=["POST", "GET"])
 def modifycourse():
+    """Add or exercises or text materials, or remove exercises."""
     course_id = request.args.get("id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -196,10 +210,11 @@ def modifycourse():
             elif not all_submissions_dict[student[0]]:
                 exercise_submission[student[0]]["state"] = "incorrect"
         submissions.append(exercise_submission)
-    return render_template(f"/modifycourse.html", course=course, exercises=exercises, materials=materials, submissions=submissions)
+    return render_template("/modifycourse.html", course=course, exercises=exercises, materials=materials, submissions=submissions)
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
+    """Add text materials and insert into the database."""
     course_id = request.form["course_id"]
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -218,6 +233,7 @@ def addtextmaterial():
 
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
+    """Create an exercise of the user's choosing and insert into the database."""
     course_id = request.form["course_id"]
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -260,6 +276,7 @@ def exercisecreated():
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
 def delete_exercise():
+    """Delete the chosen exercise and remove it from the database."""
     course_id = request.args.get("course_id")
     if not permission_check("teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -276,6 +293,7 @@ def delete_exercise():
 
 @app.route("/coursesview", methods=["POST", "GET"])
 def coursesview():
+    """Display a page for students to view all courses."""
     if not permission_check("student"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     user_id = session["user_id"]
@@ -321,6 +339,7 @@ def coursesview():
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
+    """Display the exercises and materials for the given course."""
     course_id = request.args["id"]
     if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -352,10 +371,11 @@ def exercises_materials():
     submissions_dict = {}
     for submission in exercise_submissions:
         submissions_dict[submission[0]] = submission[1]
-    return render_template(f"/exercises_materials.html", course=course, exercises=course_exercises, submissions=submissions_dict, materials=materials)
+    return render_template("/exercises_materials.html", course=course, exercises=course_exercises, submissions=submissions_dict, materials=materials)
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
+    """Page for submitting answers to exercises, and inserting into the database."""
     course_id = request.args["course_id"]
     if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -375,10 +395,11 @@ def do_exercise():
                                 AND exercise_id = :exercise_id
                                """
     exercise_submission = db.session.execute(text(exercise_submission_sql), {"course_id": course_id, "student_id": session["user_id"], "exercise_id": exercise_id}).fetchone()
-    return render_template(f"/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course, submission=exercise_submission)
+    return render_template("/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course, submission=exercise_submission)
 
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
+    """Check if there's already a submission for the exercise, then insert into the database."""
     course_id = request.form["course_id"]
     if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
@@ -419,6 +440,7 @@ def submit_answer():
 
 @app.route("/joincourse")
 def joincourse():
+    """Join a course and insert data accordingly to the database."""
     if not permission_check("student"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args.get("id")
@@ -435,6 +457,7 @@ def joincourse():
 
 @app.route("/leavecourse")
 def leavecourse():
+    """Leave a course and remove relevant data from the database."""
     course_id = request.args.get("id")
     if not permission_check("student") or not student_in_course(course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
