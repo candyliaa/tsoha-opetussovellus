@@ -48,7 +48,7 @@
             <td>{{ course["name"] }}</td>
             <td>{{ course["credits"] }}</td>
             <td>{{ course["username"] }}</td>
-            {% if course["student_count"] is None %}
+            {% if course["student_count"] is none %}
             <td>0</td>
             {% else %}
             <td>{{ course["student_count"] }}</td>
