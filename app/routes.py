@@ -182,7 +182,7 @@ def exercisecreated():
             choices_dict = {}
             choices_dict["choices"] = choices
             choices_dict["correct_answer"] = correct_answer
-            data.create_exercise(course_id, question, example_answer, exercise_type, choices_dict)
+            data.create_exercise(course_id, question, correct_answer, exercise_type, choices_dict)
         return redirect(f"/modifycourse?id={course_id}&status=exercise_added")
 
 @app.route("/delete_exercise", methods=["POST", "GET"])
