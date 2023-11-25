@@ -362,6 +362,7 @@ def submission_exists(answer, student_id, course_id, exercise_id):
     ).fetchone()
     if result is not None:
         return False
+    return True
 
 def submit_exercise(student_id: int, course_id: int, exercise_id: int, answer, status: bool):
     """Add submission data to the database when a user submits an exercise."""    
