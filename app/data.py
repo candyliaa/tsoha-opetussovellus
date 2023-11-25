@@ -42,7 +42,7 @@ def login_fetch_user(account_type: str, username: str):
     if account_type == "teacher":
         sql = "SELECT id, password FROM teacher_accounts WHERE username = :username"
     else:
-        sql = "SELECT id FROM student_accounts WHERE username = :username"
+        sql = "SELECT id, password FROM student_accounts WHERE username = :username"
     return db.session.execute(text(sql), {"username": username}).fetchone()
 
 def create_account(account_type: str, username: str, hash_value: str):
