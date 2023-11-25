@@ -205,3 +205,142 @@ def delete_exercise(course_id: int, exercise_id: int):
                         """
     db.session.execute(text(delete_exercise_sql), {"course_id": course_id, "exercise_id": exercise_id})
     db.session.commit()
+
+# Helper functions for the SQL queries for student actions
+def student_course_display(user_id: int):
+    """Fetch relevant data for displaying courses for students from the database."""
+    courses_sql = """
+                  SELECT 
+                    courses.id,
+                    name,
+                    credits,
+                    COALESCE(student_ids, '{}'),
+                    teacher_accounts.username
+                  FROM courses
+                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
+                  LEFT JOIN (
+                    SELECT course_id, ARRAY_AGG(student_id) AS student_ids
+                    FROM course_participants
+                    GROUP BY course_id
+                    ) 
+                  p ON courses.id = p.course_id
+                  """
+    all_courses = db.session.execute(text(courses_sql)).fetchall()
+
+    exercises_done_sql = """
+                         SELECT course_id, COUNT(id) 
+                         FROM exercise_answers
+                         WHERE student_id = :student_id
+                         GROUP BY course_id
+                         """
+    exercises_done = db.session.execute(text(exercises_done_sql), {"student_id": user_id}).fetchall()
+
+    total_exercises_sql = """
+                          SELECT course_id, COUNT(id)
+                          FROM exercises
+                          GROUP BY course_id
+                          """
+    total_exercises = db.session.execute(text(total_exercises_sql)).fetchall()
+
+    data_dict = {
+        "all_courses": all_courses,
+        "exercises_done": exercises_done,
+        "total_exercises": total_exercises
+    }
+    return data_dict
+
+def exercises_and_materials(course_id: int, session: dict):
+    """Fetch data for exercises and materials from database for student course display."""
+    course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
+    course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
+
+    materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
+    materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
+
+    student_id = session["user_id"]
+    course_exercises_sql = """
+                           SELECT 
+                           exercises.id, 
+                           question,
+                           choices
+                           FROM exercises
+                           WHERE exercises.course_id = :course_id
+                           ORDER BY id
+                           """
+    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+
+    exercise_submissions_sql = """
+                               SELECT
+                               exercise_id,
+                               correct
+                               FROM exercise_answers
+                               WHERE exercise_answers.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id)
+                               """
+    exercise_submissions = db.session.execute(text(exercise_submissions_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+
+    data_dict = {
+        "course": course,
+        "materials": materials,
+        "course_exercises": course_exercises,
+        "exercise_submissions": exercise_submissions
+    }
+
+    return data_dict
+
+def fetch_exercise_data(course_id: int, exercise_id: int, session: dict):
+    """Fetch relevant data for the exercise the user is doing."""
+    course_sql = "SELECT id, name FROM courses WHERE id = :course_id"
+    course = db.session.execute(
+        text(course_sql),
+        {"course_id": course_id}
+    ).fetchone()
+
+    exercise_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id AND id = :id"
+    exercise = db.session.execute(
+        text(exercise_sql),
+        {"course_id": course_id, "id": exercise_id}
+    ).fetchone()
+
+    exercise_submission_sql = """
+                               SELECT
+                               answer,
+                               correct
+                               FROM exercise_answers
+                               WHERE 
+                                exercise_answers.course_id = :course_id 
+                                AND COALESCE(exercise_answers.student_id = :student_id) 
+                                AND exercise_id = :exercise_id
+                               """
+    exercise_submission = db.session.execute(
+        text(exercise_submission_sql),
+        {"course_id": course_id, "student_id": session["user_id"], "exercise_id": exercise_id}
+    ).fetchone()
+
+    data_dict = {
+        "course": course,
+        "exercise": exercise,
+        "exercise_submission": exercise_submission
+    }
+
+    return data_dict
+
+def join_course(student_id: int, course_id: int):
+    """Check if student is already in course and insert data into the database upon joining a course."""
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
+
+    already_in_course_sql = """
+                            SELECT student_id
+                            FROM course_participants
+                            WHERE course_id = :course_id AND student_id = :student_id
+                            """
+    if db.session.execute(text(already_in_course_sql), {"course_id": course_id, "student_id": student_id}) is None:
+        return False
+    else:
+        course_join_sql = """
+                        INSERT INTO course_participants (course_id, student_id)
+                        VALUES (:course_id, :student_id)
+                        """
+        db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
+        db.session.commit()
+        return course_name

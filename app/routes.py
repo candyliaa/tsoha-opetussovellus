@@ -201,45 +201,26 @@ def coursesview():
     if not data.permission_check(session, "student"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     user_id = session["user_id"]
-    courses_sql = """
-                  SELECT 
-                    courses.id,
-                    name,
-                    credits,
-                    COALESCE(student_ids, '{}'),
-                    teacher_accounts.username
-                  FROM courses
-                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
-                  LEFT JOIN (
-                    SELECT course_id, ARRAY_AGG(student_id) AS student_ids
-                    FROM course_participants
-                    GROUP BY course_id
-                    ) 
-                  p ON courses.id = p.course_id
-                  """
-    all_courses = db.session.execute(text(courses_sql)).fetchall()
+    course_data = data.student_course_display(user_id)
+    all_courses = course_data["all_courses"]
     own_courses = list(filter(lambda c: user_id in c[3], all_courses))
     other_courses = list(filter(lambda c: user_id not in c[3], all_courses))
-    exercises_done_sql = """
-                         SELECT course_id, COUNT(id) 
-                         FROM exercise_answers
-                         WHERE student_id = :student_id
-                         GROUP BY course_id
-                         """
-    exercises_done = db.session.execute(text(exercises_done_sql), {"student_id": user_id}).fetchall()
+
+    exercises_done = course_data["exercises_done"]
     exercises_done_dict = {}
     for course in exercises_done:
         exercises_done_dict[course[0]] = course[1]
-    total_exercises_sql = """
-                          SELECT course_id, COUNT(id)
-                          FROM exercises
-                          GROUP BY course_id
-                          """
-    total_exercises = db.session.execute(text(total_exercises_sql)).fetchall()
+
+    total_exercises = course_data["total_exercises"]
     total_exercises_dict = {}
     for course in total_exercises:
         total_exercises_dict[course[0]] = course[1]
-    return render_template("/coursesview.html", own_courses=own_courses, other_courses=other_courses, exercises_done_dict=exercises_done_dict, total_exercises_dict=total_exercises_dict)
+    return render_template("/coursesview.html",
+    own_courses=own_courses,
+    other_courses=other_courses,
+    exercises_done_dict=exercises_done_dict,
+    total_exercises_dict=total_exercises_dict
+    )
 
 @app.route("/exercises_materials", methods=["POST", "GET"])
 def exercises_materials():
@@ -248,35 +229,23 @@ def exercises_materials():
     if not data.permission_check(session, "student") \
     or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
-    course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
 
-    materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
-    materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
-
-    student_id = session["user_id"]
-    course_exercises_sql = """
-                           SELECT 
-                           exercises.id, 
-                           question,
-                           choices
-                           FROM exercises
-                           WHERE exercises.course_id = :course_id
-                           ORDER BY id
-                           """
-    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
-    exercise_submissions_sql = """
-                               SELECT
-                               exercise_id,
-                               correct
-                               FROM exercise_answers
-                               WHERE exercise_answers.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id)
-                               """
-    exercise_submissions = db.session.execute(text(exercise_submissions_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+    course_data = data.exercises_and_materials(course_id, session)
+    course = course_data["course"]
+    course_materials = course_data["materials"]
+    course_exercises = course_data["course_exercises"]
+    exercise_submissions = course_data["exercise_submissions"]
+    
     submissions_dict = {}
     for submission in exercise_submissions:
         submissions_dict[submission[0]] = submission[1]
-    return render_template("/exercises_materials.html", course=course, exercises=course_exercises, submissions=submissions_dict, materials=materials)
+
+    return render_template("/exercises_materials.html",
+    course=course,
+    exercises=course_exercises,
+    submissions=submissions_dict,
+    materials=course_materials
+    )
 
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
@@ -285,23 +254,20 @@ def do_exercise():
     if not data.permission_check(session, "student") \
     or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course = db.session.execute(text("SELECT id, name FROM courses WHERE id = :course_id"), {"course_id": course_id}).fetchone()
     exercise_id = request.args["exercise_id"]
     exercise_num = request.args["exercise_num"]
-    exercise_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id AND id = :id"
-    exercise = db.session.execute(text(exercise_sql), {"course_id": course_id, "id": exercise_id}).fetchone()
-    exercise_submission_sql = """
-                               SELECT
-                               answer,
-                               correct
-                               FROM exercise_answers
-                               WHERE 
-                                exercise_answers.course_id = :course_id 
-                                AND COALESCE(exercise_answers.student_id = :student_id) 
-                                AND exercise_id = :exercise_id
-                               """
-    exercise_submission = db.session.execute(text(exercise_submission_sql), {"course_id": course_id, "student_id": session["user_id"], "exercise_id": exercise_id}).fetchone()
-    return render_template("/do_exercise.html", exercise=exercise, exercise_num=exercise_num, course=course, submission=exercise_submission)
+
+    exercise_data = data.fetch_exercise_data(course_id, exercise_id, session)
+    exercise = exercise_data["exercise"]
+    course = exercise_data["course"]
+    exercise_submission = exercise_data["exercise_submission"]
+
+    return render_template("/do_exercise.html",
+    exercise=exercise,
+    course=course,
+    exercise_num=exercise_num,
+    submission=exercise_submission
+    )
 
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
@@ -352,14 +318,10 @@ def joincourse():
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args.get("id")
     student_id = session["user_id"]
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
-    course_join_sql = """
-                      INSERT INTO course_participants (course_id, student_id)
-                      VALUES (:course_id, :student_id)
-                      """
-    db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
-    db.session.commit()
+    if not data.join_course(student_id, course_id):
+        return redirect(f"/coursesview?status=failed&course_id={course_id}")
+    else:
+        course_name = data.join_course(student_id, course_id)
     return redirect(f"/coursesview?status=joined&name={course_name}")
 
 @app.route("/leavecourse")
