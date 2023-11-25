@@ -80,6 +80,7 @@ def coursetools_courses():
     return db.session.execute(text(courses_sql)).fetchall()
 
 def check_if_course_exists(course_name: str):
+    """Check if course with that name exists when trying to create one."""
     check_sql = "SELECT name FROM courses WHERE name = :course_name"
     if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
         return False
