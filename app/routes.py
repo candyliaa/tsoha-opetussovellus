@@ -74,7 +74,7 @@ def createcourse():
     if request.method == "POST":
         course_name = request.form["course_name"]
         course_credits = int(request.form["credits"])
-        if len(course_name) < 1 or credits < 1:
+        if len(course_name) < 1 or course_credits < 1:
             return redirect("/coursetools?status=fail")
         if not data.check_if_course_exists(course_name):
             return redirect(f"/coursetools?status=already_exists&name={course_name}")
