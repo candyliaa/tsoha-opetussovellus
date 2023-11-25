@@ -198,7 +198,10 @@ def exercisecreated():
                                INSERT INTO exercises (question, choices, course_id)
                                VALUES (:question, :choices, :course_id)
                                """
-            db.session.execute(text(add_exercise_sql), {"question": question, "choices": choices_dict, "course_id": course_id})
+            db.session.execute(
+                text(add_exercise_sql),
+                {"question": question, "choices": choices_dict, "course_id": course_id}
+            )
             db.session.commit()
         return redirect(f"/modifycourse?id={course_id}&status=exercise_added")
 
@@ -206,17 +209,13 @@ def exercisecreated():
 def delete_exercise():
     """Delete the chosen exercise and remove it from the database."""
     course_id = request.args.get("course_id")
-    if not data.permission_check(session, "teacher"):
+    if not data.permission_check(session, "teacher") or \
+    not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not data.correct_teacher(session, course_id):
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+
     exercise_id = request.args.get("exercise_id")
-    delete_exercise_sql = """
-                          DELETE FROM exercises
-                          WHERE course_id = :course_id AND id = :exercise_id
-                          """
-    db.session.execute(text(delete_exercise_sql), {"course_id": course_id, "exercise_id": exercise_id})
-    db.session.commit()
+    if not data.delete_exercise(course_id, exercise_id):
+        return redirect(f"/modifycourse?id={course_id}status=remove_failed")
     return redirect(f"/modifycourse?id={course_id}&status=exercise_removed")
 
 @app.route("/coursesview", methods=["POST", "GET"])

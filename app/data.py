@@ -129,3 +129,23 @@ def modify_course_data(course_id: int):
     }
 
     return data_dict
+
+def delete_exercise(course_id: int, exercise_id: int):
+    """Remove exercise from database upon deletion."""
+    fetch_exercise_sql = """
+                         SELECT id
+                         FROM exercises
+                         WHERE course_id = :course_id AND id := exercise_id
+                         """
+    if db.session.execute( \
+        text(fetch_exercise_sql), \
+        {"course_id": course_id, "exercise_id": exericse_id} \
+        ).fetchone()[0] is None:
+            return False
+
+    delete_exercise_sql = """
+                        DELETE FROM exercises
+                        WHERE course_id = :course_id AND id = :exercise_id
+                        """
+    db.session.execute(text(delete_exercise_sql), {"course_id": course_id, "exercise_id": exercise_id})
+    db.session.commit()

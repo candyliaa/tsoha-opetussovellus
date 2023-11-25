@@ -58,6 +58,8 @@
 <button onclick="openDiv('list-exercises')">Listaa tehtävät</button>
 {% endif %}
 <div id="list-exercises" style="display: none">
+    {% if request.args.get("status") == "remove_failed" %}
+    <b>Tehtävän poisto epäonnistui, koska tehtävää ei ole olemassa!</b>
     <h3>Tehtävät</h3>
     {% for i in range(exercises|length) %}
     <b>{{ i + 1 }}. tehtävä</b>
