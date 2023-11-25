@@ -94,12 +94,15 @@ def create_course(course_name: str, course_credits: int, session: dict):
     )
     db.session.commit()
 
-def delete_course(course_id: int):
-    """Delete course from database and return the name of deleted course."""
+def check_if_course_deletable(course_id: int):
+    """Check if a course by the given id exists before deletion."""
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
     course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
     if course_name is None:
         return False
+
+def delete_course(course_id: int):
+    """Delete course from database and return the name of deleted course."""
     delete_sql = "DELETE FROM courses WHERE id =:course_id"
     db.session.execute(text(delete_sql), {"course_id": course_id})
     db.session.commit()

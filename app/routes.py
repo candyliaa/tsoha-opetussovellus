@@ -89,6 +89,8 @@ def deletecourse():
     if not data.permission_check(session, "teacher") \
     or not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
+    if not data.check_if_course_deletable:
+        return redirect("/coursetools?status=course_not_deletable")
     course_name = data.delete_course(course_id)
     return redirect(f"/coursetools?status=deleted&name={course_name}")
 

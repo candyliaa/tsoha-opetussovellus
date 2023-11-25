@@ -24,8 +24,9 @@
 <hr>
 <h2>Lista kursseista</h2>
 {% if request.args.get("status") == "deleted" %}
-<p>Kurssi {{ request.args.get("name") }} poistettu onnistuneesti!</p>
-{% endif %}
+<b>Kurssi {{ request.args.get("name") }} poistettu onnistuneesti!</b>
+{% elif request.args.get("status") == "course_not_deletable" %}
+<b>Kurssia ei ole olemassa, joten sitä ei voi poistaa!</b>
 
 {% if courses|length == 0 %}
 <h3>Kurssilista on tyhjä.</h3>
