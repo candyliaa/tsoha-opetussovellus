@@ -3,9 +3,9 @@ import json
 from flask import render_template, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import text
+import data
 from app import app
 from db import db
-import data
 
 @app.route("/")
 def index():
@@ -23,12 +23,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         account_type = request.form["role"]
-        if account_type == "teacher":
-            sql = "SELECT id, password FROM teacher_accounts WHERE username = :username"
-        else:
-            sql = "SELECT id, password FROM student_accounts WHERE username = :username"
-        result = db.session.execute(text(sql), {"username": username})
-        user = result.fetchone()
+        user = data.login_fetch_user(account_type, username)
         if not user:
             return redirect("/login?failed=1")
         else:
@@ -69,23 +64,7 @@ def coursetools():
     """Show teachers a page to view all courses."""
     if not data.permission_check(session, "teacher"):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    courses_sql = """
-                  SELECT 
-                    courses.id,
-                    name,
-                    credits,
-                    p.student_count,
-                    teacher_accounts.username
-                  FROM courses
-                  LEFT JOIN teacher_accounts ON courses.teacher_id = teacher_accounts.id
-                  LEFT JOIN (
-                    SELECT course_id, COUNT(student_id) AS student_count
-                    FROM course_participants
-                    GROUP BY course_id
-                    ) 
-                  p ON courses.id = p.course_id
-                  """
-    courses = db.session.execute(text(courses_sql)).fetchall()
+    courses = data.coursetools_courses()
     return render_template("coursetools.html", courses=courses)
 
 @app.route("/createcourse", methods=["POST"])
@@ -98,71 +77,50 @@ def createcourse():
         course_credits = int(request.form["credits"])
         if len(course_name) < 1 or credits < 1:
             return redirect("/coursetools?status=fail")
-        check_sql = "SELECT name FROM courses WHERE name = :course_name"
-        if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
+        if not data.create_course(course_name, course_credits, session):
             return redirect(f"/coursetools?status=already_exists&name={course_name}")
-        sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
-        db.session.execute(text(sql), {"course_name": course_name, "credits": course_credits, "teacher_id": session["user_id"]})
-        db.session.commit()
-        return redirect(f"/coursetools?status=success&name={course_name}")
+        else:
+            return redirect(f"/coursetools?status=success&name={course_name}")
 
 @app.route("/deletecourse")
 def deletecourse():
     """Remove a course from the database."""
     course_id = request.args.get("id")
-    if not data.permission_check(session, "teacher"):
+    if not data.permission_check(session, "teacher") \
+    or not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not data.correct_teacher(session, course_id):
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
-    sql = "DELETE FROM courses WHERE id =:course_id"
-    db.session.execute(text(sql), {"course_id": course_id})
-    db.session.commit()
+    course_name = data.delete_course(course_id)
     return redirect(f"/coursetools?status=deleted&name={course_name}")
 
 @app.route("/modifycourse", methods=["POST", "GET"])
 def modifycourse():
     """Add or exercises or text materials, or remove exercises."""
     course_id = request.args.get("id")
-    if not data.permission_check(session, "teacher"):
+    if not data.permission_check(session, "teacher") or \
+    not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not data.correct_teacher(session, course_id):
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    course_sql = "SELECT id, name, credits FROM courses WHERE id = :course_id"
-    course = db.session.execute(text(course_sql), {"course_id": course_id}).fetchone()
 
-    materials_sql = "SELECT id, title, body FROM text_materials WHERE course_id = :course_id ORDER BY id"
-    materials = db.session.execute(text(materials_sql), {"course_id": course_id}).fetchall()
+    course_data = data.modify_course_data(course_id)
+    course = course_data["course"]
+    course_materials = course_data["materials"]
 
-    course_exercises_sql = "SELECT id, question, choices FROM exercises WHERE course_id = :course_id ORDER BY id"                     
-    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id}).fetchall()
+    course_exercises = course_data["course_exercises"]
     exercises = []
     for exercise in course_exercises:
         exercises.append((exercise[0], exercise[1], exercise[2]))
 
-    course_participants_sql = """
-                              SELECT id, username
-                              FROM course_participants
-                              LEFT JOIN student_accounts
-                              ON course_participants.student_id = student_accounts.id
-                              WHERE course_id = :course_id
-                              """
-    course_participants = db.session.execute(text(course_participants_sql), {"course_id": course_id}).fetchall()
-
-    current_exercise_submissions_sql = """
-                                       SELECT student_id, correct
-                                       FROM exercise_answers
-                                       WHERE exercise_id = :exercise_id
-                                       """
+    course_participants = course_data["course_participants"]
+    current_exercise_submissions_sql = course_data["current_exercise_submissions_sql"]
     submissions = []
     for exercise in course_exercises:
         exercise_submission = {}
-        all_submissions = db.session.execute(text(current_exercise_submissions_sql), {"exercise_id": exercise[0]}).fetchall()
+        all_submissions = db.session.execute(
+            text(current_exercise_submissions_sql),
+            {"exercise_id": exercise[0]}
+        ).fetchall()
         all_submissions_dict = {}
         for submission in all_submissions:
             all_submissions_dict[submission[0]] = submission[1]
-
         for student in course_participants:
             exercise_submission[student[0]] = {
                 "username": student[1],
@@ -174,15 +132,18 @@ def modifycourse():
             elif not all_submissions_dict[student[0]]:
                 exercise_submission[student[0]]["state"] = "incorrect"
         submissions.append(exercise_submission)
-    return render_template("/modifycourse.html", course=course, exercises=exercises, materials=materials, submissions=submissions)
+    return render_template("/modifycourse.html",
+    course=course,
+    exercises=exercises,
+    materials=course_materials,
+    submissions=submissions)
 
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
     """Add text materials and insert into the database."""
     course_id = request.form["course_id"]
-    if not data.permission_check(session, "teacher"):
-        return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
-    if not data.correct_teacher(session, course_id):
+    if not data.permission_check(session, "teacher") or \
+    not data.correct_teacher(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.form["course_id"]
     title = request.form["title"]
@@ -191,7 +152,10 @@ def addtextmaterial():
                        INSERT INTO text_materials (title, body, course_id)
                        VALUES (:title, :body, :course_id)
                        """
-    db.session.execute(text(add_material_sql), {"title": title, "body": body, "course_id": course_id})
+    db.session.execute(
+        text(add_material_sql),
+        {"title": title, "body": body, "course_id": course_id}
+    )
     db.session.commit()
     return redirect(f"/modifycourse?id={course_id}&status=material_added")
 
