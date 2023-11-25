@@ -370,11 +370,8 @@ def submit_exercise(student_id: int, course_id: int, exercise_id: int, answer, s
     )
     db.session.commit()
 
-def join_course(student_id: int, course_id: int):
-    """Check if student is already in course and insert data into the database upon joining a course."""
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
-
+def already_in_course(student_id: int, course_id: int):
+    """Check if student is in a course."""
     already_in_course_sql = """
                             SELECT student_id
                             FROM course_participants
@@ -382,14 +379,19 @@ def join_course(student_id: int, course_id: int):
                             """
     if db.session.execute(text(already_in_course_sql), {"course_id": course_id, "student_id": student_id}) is None:
         return False
-    else:
-        course_join_sql = """
-                        INSERT INTO course_participants (course_id, student_id)
-                        VALUES (:course_id, :student_id)
-                        """
-        db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
-        db.session.commit()
-        return course_name
+    return True
+
+def join_course(student_id: int, course_id: int):
+    """Insert data into the database upon joining a course."""
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
+    course_join_sql = """
+                    INSERT INTO course_participants (course_id, student_id)
+                    VALUES (:course_id, :student_id)
+                    """
+    db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
+    db.session.commit()
+    return course_name
 
 def leave_course(student_id: int, course_id: int):
     """Remove data from the database when a student leaves a course.""" 

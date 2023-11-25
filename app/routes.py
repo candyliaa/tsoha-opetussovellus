@@ -307,7 +307,7 @@ def joincourse():
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     course_id = request.args.get("id")
     student_id = session["user_id"]
-    if not data.join_course(student_id, course_id):
+    if not data.already_in_course(student_id, course_id):
         return redirect(f"/coursesview?status=failed&course_id={course_id}")
     else:
         course_name = data.join_course(student_id, course_id)
