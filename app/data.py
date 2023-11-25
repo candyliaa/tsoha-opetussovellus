@@ -344,3 +344,24 @@ def join_course(student_id: int, course_id: int):
         db.session.execute(text(course_join_sql), {"course_id": course_id, "student_id": student_id})
         db.session.commit()
         return course_name
+
+def leave_course(student_id: int, course_id: int):
+    """Remove data from the database when a student leaves a course.""" 
+    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
+    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
+    leave_course_sql = """
+                       DELETE FROM course_participants
+                       WHERE student_id = :student_id
+                       AND course_id = :course_id
+                       """
+    delete_submissions_sql = """
+                             DELETE FROM exercise_answers
+                             WHERE student_id = :student_id
+                             AND course_id = :course_id
+                             """
+
+    db.session.execute(text(leave_course_sql), {"student_id": student_id, "course_id": course_id})
+    db.session.commit()
+    db.session.execute(text(delete_submissions_sql), {"student_id": student_id, "course_id": course_id})
+    db.session.commit()
+    return course_name

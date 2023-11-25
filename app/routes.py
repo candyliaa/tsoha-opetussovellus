@@ -332,20 +332,5 @@ def leavecourse():
     or not data.student_in_course(session, course_id):
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
     student_id = session["user_id"]
-    course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
-    course_name = db.session.execute(text(course_name_sql), {"course_id": course_id}).fetchone()[0]
-    leave_course_sql = """
-                       DELETE FROM course_participants
-                       WHERE student_id = :student_id
-                       AND course_id = :course_id
-                       """
-    delete_submissions_sql = """
-                             DELETE FROM exercise_answers
-                             WHERE student_id = :student_id
-                             AND course_id = :course_id
-                             """
-    db.session.execute(text(leave_course_sql), {"student_id": student_id, "course_id": course_id})
-    db.session.commit()
-    db.session.execute(text(delete_submissions_sql), {"student_id": student_id, "course_id": course_id})
-    db.session.commit()
+    course_name = data.leave_course(student_id, course_id)
     return redirect(f"/coursesview?status=left&name={course_name}")
