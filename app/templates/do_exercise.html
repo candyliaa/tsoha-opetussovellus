@@ -15,6 +15,7 @@
 <h2 style="margin-top: 5px">{{ exercise[1] }}</h2>
 {% if submission is none %}
 <form action="/submit_answer" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <input type="hidden" name="course_id" value="{{ course['id'] }}">
     <input type="hidden" name="exercise_id" value="{{ exercise['id'] }}">
     <input type="hidden" name="exercise_num" value="{{ exercise_num }}">

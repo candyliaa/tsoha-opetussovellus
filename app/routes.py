@@ -162,6 +162,8 @@ def modifycourse():
 @app.route("/addtextmaterial", methods=["POST"])
 def addtextmaterial():
     """Add text materials and insert into the database."""
+    if not data.csrf_token_check:
+        abort(403)
     course_id = request.form["course_id"]
     if not data.permission_check(session, "teacher") or not data.correct_teacher(
         session, course_id
@@ -178,6 +180,8 @@ def addtextmaterial():
 @app.route("/exercisecreated", methods=["POST"])
 def exercisecreated():
     """Create an exercise of the user's choosing and insert into the database."""
+    if not data.csrf_token_check:
+        abort(403)
     course_id = request.form["course_id"]
     if not data.permission_check(session, "teacher") or not data.correct_teacher(
         session, course_id
@@ -286,8 +290,6 @@ def exercises_materials():
 @app.route("/do_exercise", methods=["POST", "GET"])
 def do_exercise():
     """Page for submitting answers to exercises, and inserting into the database."""
-    if not data.csrf_token_check:
-        abort(403)
     course_id = request.args["course_id"]
     if not data.permission_check(session, "student") or not data.student_in_course(
         session, course_id
@@ -313,6 +315,8 @@ def do_exercise():
 @app.route("/submit_answer", methods=["POST", "GET"])
 def submit_answer():
     """Check if there's already a submission for the exercise, then insert into the database."""
+    if not data.csrf_token_check:
+        abort(403)
     course_id = request.form["course_id"]
     if not data.permission_check(session, "student") or not data.student_in_course(
         session, course_id

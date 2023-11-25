@@ -28,6 +28,7 @@
 <button onclick="openDiv('materialform')">Lisää tekstimateriaalia</button>
 <div id="materialform" style="display: none">
     <form action="/addtextmaterial", method="POST">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="hidden" name="course_id" value="{{ course['id'] }}">
         <label for="title">Materiaalin otsikko</label>
         <br>
@@ -112,6 +113,7 @@
 </div>
 <div id="textform" style="display: none">
     <form action="/exercisecreated" id="textform" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="hidden" name="course_id" value="{{ course['id'] }}">
         <input type="hidden" name="exercise_type" value="text_question">
         <label for="question">Tehtävän kysymys:</label>
@@ -127,6 +129,7 @@
 </div>
 <div id="multiplechoiceform" style="display: none">
     <form action="/exercisecreated" id="multiple_choice" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="hidden" name="course_id" value="{{ course['id'] }}">
         <input type="hidden" name="exercise_type" value="multiple_choice">
         <label for="question">Tehtävän kysymys:</label>
