@@ -84,9 +84,9 @@ def create_course(course_name: str, course_credits: int, session: dict):
     check_sql = "SELECT name FROM courses WHERE name = :course_name"
     if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
         return False
-    sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
+    add_course_sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
     db.session.execute(
-        text(sql),
+        text(add_course_sql),
         {"course_name": course_name, "credits": course_credits, "teacher_id": session["user_id"]}
     )
     db.session.commit()
@@ -203,7 +203,10 @@ def delete_exercise(course_id: int, exercise_id: int):
                         DELETE FROM exercises
                         WHERE course_id = :course_id AND id = :exercise_id
                         """
-    db.session.execute(text(delete_exercise_sql), {"course_id": course_id, "exercise_id": exercise_id})
+    db.session.execute(
+        text(delete_exercise_sql),
+        {"course_id": course_id, "exercise_id": exercise_id}
+    )
     db.session.commit()
 
 # Helper functions for the SQL queries for student actions
@@ -233,7 +236,10 @@ def student_course_display(user_id: int):
                          WHERE student_id = :student_id
                          GROUP BY course_id
                          """
-    exercises_done = db.session.execute(text(exercises_done_sql), {"student_id": user_id}).fetchall()
+    exercises_done = db.session.execute(
+        text(exercises_done_sql),
+        {"student_id": user_id}
+    ).fetchall()
 
     total_exercises_sql = """
                           SELECT course_id, COUNT(id)
@@ -267,7 +273,10 @@ def exercises_and_materials(course_id: int, session: dict):
                            WHERE exercises.course_id = :course_id
                            ORDER BY id
                            """
-    course_exercises = db.session.execute(text(course_exercises_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+    course_exercises = db.session.execute(
+        text(course_exercises_sql),
+        {"course_id": course_id, "student_id": student_id}
+    ).fetchall()
 
     exercise_submissions_sql = """
                                SELECT
@@ -276,7 +285,10 @@ def exercises_and_materials(course_id: int, session: dict):
                                FROM exercise_answers
                                WHERE exercise_answers.course_id = :course_id AND COALESCE(exercise_answers.student_id = :student_id)
                                """
-    exercise_submissions = db.session.execute(text(exercise_submissions_sql), {"course_id": course_id, "student_id": student_id}).fetchall()
+    exercise_submissions = db.session.execute(
+        text(exercise_submissions_sql),
+        {"course_id": course_id, "student_id": student_id}
+    ).fetchall()
 
     data_dict = {
         "course": course,
@@ -331,7 +343,10 @@ def submission_exists(answer, student_id, course_id, exercise_id):
                                  FROM exercise_answers
                                  WHERE student_id = :student_id AND course_id = :course_id AND exercise_id = :exercise_id
                                  """
-    result = db.session.execute(text(check_if_answer_exists_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id}).fetchone()
+    result = db.session.execute(
+        text(check_if_answer_exists_sql),
+        {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id}
+    ).fetchone()
     if result is not None:
         return False
 
@@ -341,7 +356,10 @@ def submit_exercise(student_id: int, course_id: int, exercise_id: int, answer, s
                     INSERT INTO exercise_answers (answer, student_id, course_id, exercise_id, correct)
                     VALUES (:answer, :student_id, :course_id, :exercise_id, :correct)
                     """
-    db.session.execute(text(add_exercise_sql), {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": status})
+    db.session.execute(
+        text(add_exercise_sql),
+        {"answer": answer, "student_id": student_id, "course_id": course_id, "exercise_id": exercise_id, "correct": status}
+    )
     db.session.commit()
 
 def join_course(student_id: int, course_id: int):
