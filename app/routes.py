@@ -1,4 +1,5 @@
 """File containing all routes."""
+import secrets
 from flask import render_template, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import text
@@ -35,6 +36,7 @@ def login():
                 session["username"] = username
                 session["role"] = account_type
                 session["user_id"] = user[0]
+                session["csrf_token"] = secrets.token_hex(16)
                 return redirect("/")
             else:
                 return redirect("/login?failed=2")
@@ -53,6 +55,7 @@ def accountcreated():
     session["username"] = username
     session["role"] = account_type
     session["user_id"] = user_id
+    session["csrf_token"] = secrets.token_hex(16)
     return render_template("accountcreated.html", username=request.form["username"])
 
 
