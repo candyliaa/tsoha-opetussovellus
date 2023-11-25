@@ -84,6 +84,7 @@ def check_if_course_exists(course_name: str):
     check_sql = "SELECT name FROM courses WHERE name = :course_name"
     if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
         return False
+    return True
 
 def create_course(course_name: str, course_credits: int, session: dict):
     """Insert course data into the database upon creation."""
@@ -100,6 +101,7 @@ def check_if_course_deletable(course_id: int):
     course_name = db.session.execute(text(course_name_sql), {"course_id":course_id}).fetchone()[0]
     if course_name is None:
         return False
+    return True
 
 def delete_course(course_id: int):
     """Delete course from database and return the name of deleted course."""
@@ -194,19 +196,22 @@ def create_exercise(course_id: int, question: str, example_answer, exercise_type
         )
         db.session.commit()
 
-def delete_exercise(course_id: int, exercise_id: int):
-    """Remove exercise from database upon deletion."""
+def check_if_exercise_exists(course_id: int, exercise_id: int):
+    """Check if an exercise exists."""
     fetch_exercise_sql = """
                          SELECT id
                          FROM exercises
-                         WHERE course_id = :course_id AND id := exercise_id
+                         WHERE course_id = :course_id AND id = :exercise_id
                          """
-    if db.session.execute( \
-        text(fetch_exercise_sql), \
-        {"course_id": course_id, "exercise_id": exercise_id} \
+    if db.session.execute(
+            text(fetch_exercise_sql),
+            {"course_id": course_id, "exercise_id": exercise_id}
         ).fetchone()[0] is None:
         return False
+    return True
 
+def delete_exercise(course_id: int, exercise_id: int):
+    """Remove exercise from database upon deletion."""
     delete_exercise_sql = """
                         DELETE FROM exercises
                         WHERE course_id = :course_id AND id = :exercise_id

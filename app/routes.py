@@ -194,8 +194,9 @@ def delete_exercise():
         return render_template("error.html", error="Ei oikeutta nähdä tätä sivua")
 
     exercise_id = request.args.get("exercise_id")
-    if not data.delete_exercise(course_id, exercise_id):
+    if not data.check_if_exercise_exists(course_id, exercise_id):
         return redirect(f"/modifycourse?id={course_id}status=remove_failed")
+    data.delete_exercise(course_id, exercise_id)
     return redirect(f"/modifycourse?id={course_id}&status=exercise_removed")
 
 @app.route("/coursesview", methods=["POST", "GET"])
