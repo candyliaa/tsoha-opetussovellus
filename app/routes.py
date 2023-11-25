@@ -76,9 +76,10 @@ def createcourse():
         course_credits = int(request.form["credits"])
         if len(course_name) < 1 or credits < 1:
             return redirect("/coursetools?status=fail")
-        if not data.create_course(course_name, course_credits, session):
+        if not data.check_if_course_exists(course_name):
             return redirect(f"/coursetools?status=already_exists&name={course_name}")
         else:
+            data.create_course(course_name, course_credits, session)
             return redirect(f"/coursetools?status=success&name={course_name}")
 
 @app.route("/deletecourse")
@@ -235,7 +236,7 @@ def exercises_materials():
     course_materials = course_data["materials"]
     course_exercises = course_data["course_exercises"]
     exercise_submissions = course_data["exercise_submissions"]
-    
+
     submissions_dict = {}
     for submission in exercise_submissions:
         submissions_dict[submission[0]] = submission[1]

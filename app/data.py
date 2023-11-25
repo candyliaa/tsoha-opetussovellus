@@ -79,11 +79,13 @@ def coursetools_courses():
                   """
     return db.session.execute(text(courses_sql)).fetchall()
 
-def create_course(course_name: str, course_credits: int, session: dict):
-    """Check if course exists and insert course data into the database upon creation."""
+def check_if_course_exists(course_name: str):
     check_sql = "SELECT name FROM courses WHERE name = :course_name"
     if db.session.execute(text(check_sql), {"course_name": course_name}).fetchone() is not None:
         return False
+
+def create_course(course_name: str, course_credits: int, session: dict):
+    """Insert course data into the database upon creation."""
     add_course_sql = "INSERT INTO courses (name, credits, teacher_id) VALUES (:course_name, :credits, :teacher_id)"
     db.session.execute(
         text(add_course_sql),
