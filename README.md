@@ -59,15 +59,15 @@ $ pip install -r ./app/requirements.txt
 ```
 Then, build the database using the schema:
 ```
-psql < db/schema.sql
+$ psql < db/schema.sql
 ```
 Optionally, you can also add some test data to the database:
 ```
-psql < db/test_data.sql
+$ psql < db/test_data.sql
 ```
 You can now run the app with the command
 ```
-flask run
+$ flask run
 ```
 
 # Current state of the app
