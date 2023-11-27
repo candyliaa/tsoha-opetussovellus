@@ -8,9 +8,10 @@ The current functionality of the app is as follows:
 - Teachers can see which students have done which exercises, and if they are correct or incorrect
 
 # Running the app
+**With Docker**
 First, clone the repository:
 ```
-git clone https://github.com/candyliaa/tsoha-opetussovellus.git
+$ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
 ```
 You can run the app with [Docker](https://www.docker.com/). You can install it [here](https://docs.docker.com/get-docker/).
 The structure of the Docker containers follows [this](https://docs.docker.com/compose/gettingstarted/) guide.
@@ -26,11 +27,42 @@ After that, launch the Docker Desktop application, and run
 $ docker compose up
 ```
 You can then open the app at [`http://localhost:8000`](http://localhost:8000) .
+**Without Docker**
+Alternatively, the app can be ran without Docker.
+Clone the repository:
+```
+$ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
+```
+Remove all Docker related files: `Dockerfile` in both the `app` and `db` dictionaries, as well as `compose.yaml.example`.
+Then, create a `.env` file, and add two lines, one for the `SECRET_KEY`, and one for the `DATABASE_URL`. It should look like this:
+```
+SECRET_KEY = <KEY_GOES_HERE>
+DATABASE_URL = <URL_GOES_HERE>
+```
+Generate a secret key:
+```
+$ python3
+>>> import secrets
+>>> secrets.token_hex(16)
+```
+As for the `DATABASE_URL`, you can input the following: `"postgresql://postgres@localhost/postgres"`. 
+Be mindful of the fact that this attempts to connect to a local database named `postgres`, which might already exist.
+
+Next, install all required packages with a virtual environment:
+```
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install -r ./app/requirements.txt
+```
+Then, build the database using the schema:
+`psql < db/schema.sql`
+Optionally, you can also add some test data to the database:
+`psql < db/test_data.sql`
+You can now run the app with the command
+```
+flask run
+```
 
 # Current state of the app
-Although the app is mostly done functionality wise, the styling is still to be improved - both the look of the HTML pages, and the structure of the code (mostly moving things such as SQL -queries from the routes in `routes.py` to another file, for easier reading of routes.)
-
-There are also some potential bugs with displaying exercises and courses properly when there are multiple students in a course.
-~~Right now there is one such bug I'm aware of: if two students join the same course, and one of them does any exercise, that exercise doesn't show up for the other student.~~ Fixed, but there might be similar bugs.
-
-More validation checks for data submitted through forms need to be implemented, too - mainly getting rid of CSRF-vulnerabilities.
+Although the app is mostly done functionality wise, the styling of the web pages is still to be improved. Some of the code in `routes.py` has been moved to `data.py` so that the logic in `routes.py` is easier to follow. The code has also been formatted using pylint and Black Formatter.
+There should be no security vulnerabilities (at least no SQL injection, XSS or CSRF attack risk). 
