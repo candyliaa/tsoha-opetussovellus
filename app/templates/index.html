@@ -9,15 +9,21 @@
         <div class="col-4">
             <h1>Tervetuloa!</h1>
             {% if session.role == "teacher" %}
-                <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
-                <a href="/coursetools">Kurssityökalut</a>
-                <br>
+            <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
+            <a href="/coursetools">
+                <button>Kurssityökalut</button>
+            </a>
+            <br>
             {% else %}
-                <h2>Olet kirjautuneena tilillä {{ session.username }} (opiskelijatili)</h2>
-                <a href="/coursesview">Kurssinäkymään</a>
-                <br>
+            <h2>Olet kirjautuneena tilillä {{ session.username }} (opiskelijatili)</h2>
+            <a href="/coursesview">
+                <button>Kurssinäkymään</button>
+            <br>
             {% endif %}
-                <a href="/logout">Kirjaudu ulos</a>
+            <br>
+            <a href="/logout">
+                <button>Kirjaudu ulos</button>
+            </a>
         </div>
         <div class="col-8">
             <b>Toimintoja</b>
@@ -33,13 +39,40 @@
     <div class="row">
         <div class="col-4">
             <h1>Tervetuloa!</h1>
-            <form action="accountcreated" method="POST">
-                <div>
-                    <a href="/login">Kirjaudu sisään</a>
-                </div>
-                <div>
-                    <b>Tai jos sinulla ei vielä ole tiliä, luo tili:</b>
-                </div>
+            {% if request.args.get("loginfailed") == "1" %}
+            <title>Kirjautuminen epäonnistui</title>
+            <p style="color:red">Tiliä ei ole olemassa, kokeile uudelleen.</p>
+            <p>Valitsitko väärän tilityypin?</p>
+            {% endif %}
+            {% if request.args.get("loginfailed") == "2" %}
+            <title>Salasana väärin</title>
+            <p style="color:red">Salasana on väärin, kokeile uudelleen.</p>
+            {% endif %}
+            <b>Kirjaudu sisään:</b>
+            <form action="/login" method="POST">
+                <title>Kirjautuminen</title>
+                Käyttäjänimi: 
+                <br>
+                <input type="text" name="username" minlength="5" maxlength="20" required>
+                <br>
+                Salasana:
+                <br>
+                <input type="text" name="password" minlength="5" required>
+                <br>
+                Oletko opiskelija vai opettaja?
+                <br>
+                <input type="radio" id="student" name="role" value="student" required>
+                <label for="student">Opiskelija</label>
+                <input type="radio" id="teacher" name="role" value="teacher" required>
+                <label for="teacher">Opettaja</label>
+                <br>
+                <input type="submit" value="Kirjaudu sisään" class="btn btn-primary">
+            </form>
+            <br>
+            <b>Tai jos sinulla ei ole vielä tiliä, luo tili:</b>
+            <button onclick="displayDiv('registerForm')">Avaa lomake</button>
+            <div id="registerForm" style="display: none">
+                <form action="accountcreated" method="POST"></form>
                 <div>
                     <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
                     <br>
@@ -59,8 +92,9 @@
                     <input type="radio" id="teacher" name="role" value="teacher">
                     <label for="teacher">Opettaja</label>
                 </div> 
-                <input type="submit" value="Luo tili">
+                <input type="submit" value="Luo tili" class="btn btn-primary">
             </form>
+            </div>
         </div>
         <div class="col-8">
             <b>Toimintoja</b>
@@ -72,4 +106,14 @@
     </div>
 </div>
 {% endif %}
+<script>
+    function displayDiv(divID) {
+        const div = document.getElementById(divID);
+        if (div.style.display === "none") {
+            div.style.display = "block";
+        } else {
+            div.style.display = "none";
+        }
+    }
+</script>
 {% endblock %}
