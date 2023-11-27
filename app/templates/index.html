@@ -1,52 +1,75 @@
 {% extends "layout.html" %}
 {% block title %}Etusivu{% endblock %}
-
+<title>Opetussovellus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 {% block content %}
 {% if session.username %}
-    <h1>Tervetuloa!</h1>
-    {% if session.role == "teacher" %}
-        <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
-        <a href="/coursetools">Kurssityökalut</a>
-        <br>
-    {% else %}
-        <h2>Olet kirjautuneena tilillä {{ session.username }} (opiskelijatili)</h2>
-        <a href="/coursesview">Kurssinäkymään</a>
-    {% endif %}
-    <br>
-    <a href="/logout">Kirjaudu ulos</a>
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <h1>Tervetuloa!</h1>
+            {% if session.role == "teacher" %}
+                <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
+                <a href="/coursetools">Kurssityökalut</a>
+                <br>
+            {% else %}
+                <h2>Olet kirjautuneena tilillä {{ session.username }} (opiskelijatili)</h2>
+                <a href="/coursesview">Kurssinäkymään</a>
+                <br>
+            {% endif %}
+                <a href="/logout">Kirjaudu ulos</a>
+        </div>
+        <div class="col-8">
+            <b>Toimintoja</b>
+            <p>
+                Sovelluksessa voit opettajana luoda kursseja, lisätä niihin tehtäviä ja tekstimateriaaleja, sekä katsella, kuka kurssin opiskelijoista on tehnyt mitkätkin tehtävät. Voit myös poistaa tehtäviä ja kursseja, jotka olet itse luonut.
+            <p>
+                Opiskelijana voit puolestaan liittyä kursseille, tehdä tehtäviä ja poistua kursseilta. Näet tehtävien jälkeen mallivastauksen ja saat suoraan palautteen, menikö se oikein vai väärin. Voit myös katsella opettajan lisäämiä tekstimateriaaleja.
+        </div>
+    </div>
+</div>
 {% else %}
-<title>Opetussovellus</title>
-<h1>Tervetuloa!</h1>
-<form action="accountcreated" method="POST">
-    <div class="flex_gap">
-        <div>
-            <a href="/login">Kirjaudu sisään</a>
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <h1>Tervetuloa!</h1>
+            <form action="accountcreated" method="POST">
+                <div>
+                    <a href="/login">Kirjaudu sisään</a>
+                </div>
+                <div>
+                    <b>Tai jos sinulla ei vielä ole tiliä, luo tili:</b>
+                </div>
+                <div>
+                    <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
+                    <br>
+                    <input type="text" name="username" minlength="5" maxlength="20" required>
+                </div>
+                <div>
+                    <label for="password">Salasana (Vähintään 5 merkkiä)</label>
+                    <br>
+                    <input type="text" name="password" minlength="5" required>
+                </div>
+                Oletko opiskelija vai opettaja?
+                <div>
+                    <input type="radio" id="student" name="role" value="student">
+                    <label for="student">Opiskelija</label>
+                </div>
+                <div>
+                    <input type="radio" id="teacher" name="role" value="teacher">
+                    <label for="teacher">Opettaja</label>
+                </div> 
+                <input type="submit" value="Luo tili">
+            </form>
         </div>
-        <div>
-            <b>Tai jos sinulla ei vielä ole tiliä, luo tili:</b>
-        </div>
-        <div>
-            <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
-            <input type="text" name="username" minlength="5" maxlength="20" required>
-        </div>
-        <div>
-            <label for="password">Salasana (Vähintään 5 merkkiä)</label>
-            <input type="text" name="password" minlength="5" required>
+        <div class="col-8">
+            <b>Toimintoja</b>
+            <p>
+                Sovelluksessa voit opettajana luoda kursseja, lisätä niihin tehtäviä ja tekstimateriaaleja, sekä katsella, kuka kurssin opiskelijoista on tehnyt mitkätkin tehtävät. Voit myös poistaa tehtäviä ja kursseja, jotka olet itse luonut.
+            <p>
+                Opiskelijana voit puolestaan liittyä kursseille, tehdä tehtäviä ja poistua kursseilta. Näet tehtävien jälkeen mallivastauksen ja saat suoraan palautteen, menikö se oikein vai väärin. Voit myös katsella opettajan lisäämiä tekstimateriaaleja.
         </div>
     </div>
-    Oletko opiskelija vai opettaja?
-    <div class="selection_gap">
-        <div>
-            <input type="radio" id="student" name="role" value="student">
-            <label for="student">Opiskelija</label>
-        </div>
-        <div>
-            <input type="radio" id="teacher" name="role" value="teacher">
-            <label for="teacher">Opettaja</label>
-        </div> 
-    </div>
-    <br>
-    <input type="submit" value="Luo tili">
-</form>
+</div>
 {% endif %}
 {% endblock %}
