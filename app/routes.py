@@ -23,13 +23,13 @@ def login():
             or "password" not in request.form
             or "role" not in request.form
         ):
-            return redirect("/login?failed=1")
+            return redirect("/?loginfailed=1")
         username = request.form["username"]
         password = request.form["password"]
         account_type = request.form["role"]
         user = data.login_fetch_user(account_type, username)
         if not user:
-            return redirect("/login?failed=1")
+            return redirect("/?loginfailed=1")
         else:
             hash_value = user.password
             if check_password_hash(hash_value, password):
@@ -39,7 +39,7 @@ def login():
                 session["csrf_token"] = secrets.token_hex(16)
                 return redirect("/")
             else:
-                return redirect("/login?failed=2")
+                return redirect("/?loginfailed=2")
     else:
         return render_template("login.html")
 
