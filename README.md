@@ -8,8 +8,8 @@ The current functionality of the app is as follows:
 - Teachers can see which students have done which exercises, and if they are correct or incorrect
 
 # Running the app
-**With Docker**
-
+**With Docker** <br />
+<br />
 First, clone the repository:
 ```
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
@@ -27,9 +27,8 @@ After that, launch the Docker Desktop application, and run
 ```
 $ docker compose up
 ```
-You can then open the app at [`http://localhost:8000`](http://localhost:8000) .
-
-
+You can then open the app at [`http://localhost:8000`](http://localhost:8000) . <br />
+<br />
 **Without Docker**
 
 Alternatively, the app can be ran without Docker.
