@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Opetussovellus - {% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="styles.css">
-{% if session.username %}
-<div class="top_right">
-    <p>Olet kirjautuneena tilillä: {{ session.username }}</p>
-    <a href="/logout">Kirjaudu ulos</a>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+<div class="position-relative">
+    <div class="float-right">
+        {% if session.username %}
+        <p>Olet kirjautuneena tilillä: {{ session.username }}</p>
+        <a href="/logout">Kirjaudu ulos</a>
+        {% else %}
+        <p>Et ole kirjautunut sisään.</p>
+        {% endif %}
+    </div>
 </div>
 
-{% else %}
-<p class="top_right">Et ole kirjautunut sisään.</p>
-{% endif %}
+
 </head>
 <body>
-    <h1>Opetussovellus</h1>
-    <a href="/">Etusivu</a>
-    <hr>
+    <div class="text-center">
+        <h1>Opetussovellus</h1>
+        <a href="/">Etusivu</a>
+        <hr>
+    </div>
     {% block content %}{% endblock %}
     <hr>
 </body>
