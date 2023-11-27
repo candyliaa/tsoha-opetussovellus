@@ -9,6 +9,7 @@ The current functionality of the app is as follows:
 
 # Running the app
 **With Docker**
+
 First, clone the repository:
 ```
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
@@ -27,7 +28,10 @@ After that, launch the Docker Desktop application, and run
 $ docker compose up
 ```
 You can then open the app at [`http://localhost:8000`](http://localhost:8000) .
+
+
 **Without Docker**
+
 Alternatively, the app can be ran without Docker.
 Clone the repository:
 ```
