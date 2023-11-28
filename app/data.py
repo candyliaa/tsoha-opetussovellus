@@ -48,11 +48,13 @@ def correct_teacher(session: dict, course_id: str):
         return False
     return True
 
+
 def csrf_token_check(session: dict, form_token: str):
     """Check if the csrf token of the current user session matches the form's csrf token."""
     if session["csrf_token"] != form_token:
         return False
     return True
+
 
 # Login and account creation functions
 def login_fetch_user(account_type: str, username: str):
@@ -62,6 +64,26 @@ def login_fetch_user(account_type: str, username: str):
     else:
         sql = "SELECT id, password FROM student_accounts WHERE username = :username"
     return db.session.execute(text(sql), {"username": username}).fetchone()
+
+
+def check_account_exists(username: str):
+    """Check if a user account with the given username exists in the database."""
+    check_teacher_accounts_sql = (
+        "SELECT username FROM teacher_accounts WHERE username = :username"
+    )
+    check_student_accounts_sql = (
+        "SELECT username FROM student_accounts WHERE username = :username"
+    )
+    teacher = db.session.execute(
+        text(check_teacher_accounts_sql), {"username": username}
+    ).fetchone()
+    student = db.session.execute(
+        text(check_student_accounts_sql), {"username": username}
+    ).fetchone()
+    if teacher is None and student is None:
+        return True
+    else:
+        return False
 
 
 def create_account(account_type: str, username: str, hash_value: str):
@@ -448,6 +470,7 @@ def already_in_course(student_id: int, course_id: int):
         return False
     return True
 
+
 def course_name_by_id(course_id: int):
     """Fetch the name of a course by its id."""
     course_name_sql = "SELECT name FROM courses WHERE id = :course_id"
@@ -455,6 +478,7 @@ def course_name_by_id(course_id: int):
         text(course_name_sql), {"course_id": course_id}
     ).fetchone()[0]
     return course_name
+
 
 def join_course(student_id: int, course_id: int):
     """Insert data into the database upon joining a course."""

@@ -51,12 +51,15 @@ def accountcreated():
     password = request.form["password"]
     hash_value = generate_password_hash(password)
     account_type = request.form["role"]
-    user_id = data.create_account(account_type, username, hash_value)
-    session["username"] = username
-    session["role"] = account_type
-    session["user_id"] = user_id
-    session["csrf_token"] = secrets.token_hex(16)
-    return render_template("accountcreated.html", username=request.form["username"])
+    if data.check_account_exists(username):
+        user_id = data.create_account(account_type, username, hash_value)
+        session["username"] = username
+        session["role"] = account_type
+        session["user_id"] = user_id
+        session["csrf_token"] = secrets.token_hex(16)
+        return render_template("accountcreated.html", username=request.form["username"])
+    else:
+        return redirect("/?status=account_exists")
 
 
 @app.route("/logout")

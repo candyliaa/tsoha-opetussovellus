@@ -72,6 +72,8 @@
             <b>Tai jos sinulla ei ole vielä tiliä, luo tili:</b>
             <button onclick="displayDiv('registerForm')">Avaa lomake</button>
             <div id="registerForm" style="display: none">
+            {% if request.args.get("status") == "already_exists" %}
+            <b>Tuon niminen käyttäjätili on jo olemassa!</b>
                 <form action="accountcreated" method="POST"></form>
                 <div>
                     <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
@@ -84,14 +86,12 @@
                     <input type="text" name="password" minlength="5" required>
                 </div>
                 Oletko opiskelija vai opettaja?
-                <div>
-                    <input type="radio" id="student" name="role" value="student">
-                    <label for="student">Opiskelija</label>
-                </div>
-                <div>
-                    <input type="radio" id="teacher" name="role" value="teacher">
-                    <label for="teacher">Opettaja</label>
-                </div> 
+                <br>
+                <input type="radio" id="student" name="role" value="student">
+                <label for="student">Opiskelija</label>
+                <input type="radio" id="teacher" name="role" value="teacher">
+                <label for="teacher">Opettaja</label>
+                <br>
                 <input type="submit" value="Luo tili" class="btn btn-primary">
             </form>
             </div>
