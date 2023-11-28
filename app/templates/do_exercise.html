@@ -46,11 +46,11 @@
             {% elif exercise[2] is not mapping and (submission["correct"] is not none or request.args.get("show_answer") == "True") %}
             <b>Vastauksesi:</b>
             <br>
-            <textarea style="resize: none" rows="4" cols="50" readonly>{{ submission["answer"] }}</textarea>
+            <textarea class="form-control" style="resize: none" rows="4" cols="50" readonly>{{ submission["answer"] }}</textarea>
             <br>
             <b>Mallivastaus:</b>
             <br>
-            <textarea style="resize: none" name="example_answer" rows="4" cols="50" readonly>{{ exercise["choices"] }}</textarea>
+            <textarea class="form-control" resize: none" name="example_answer" rows="4" cols="50" readonly>{{ exercise["choices"] }}</textarea>
             {% elif exercise[2] is mapping and (submission["correct"] is not none or request.args.get("show_answer") == "True") %}
             <b>Vastasit: {{ exercise[2]["choices"][submission["answer"]|int - 1] }}</b>
             <br>
