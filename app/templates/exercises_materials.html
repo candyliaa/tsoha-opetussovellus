@@ -41,7 +41,7 @@
             {% else %}
             {% set col = "orange" %}
             {% endif %}
-            <!--Visual Studio Code shows an error here, although this code works-->
+            <!--Visual Studio Code shows multiple errors here, although this code works-->
             <a style="color: {{ col }};font-size: large" href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i]['id'] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
             {% endfor %}
             {% endif %}
