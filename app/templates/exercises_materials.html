@@ -42,11 +42,13 @@
             {% set col = "orange" %}
             {% endif %}
             <!--Visual Studio Code shows an error here, although this code works-->
-            <a style="color: {{ col }}" href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i]['id'] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
+            <a style="color: {{ col }};font-size: large" href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i]['id'] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
             {% endfor %}
             {% endif %}
         </div>
         <div class="col-6">
+            <b>Ohjeita</b>
+            <br>
             <p>Tällä sivulla voit tehdä valitun kurssin tehtäviä ja katsella tekstimateriaaleja, joita opettaja on lisännyt.</p>
             <button onclick="openDiv('instructions')">Näytä ohjeet</button>
             <div id="instructions" style="display: none">
@@ -56,6 +58,7 @@
                 <p><p style="color: red;display: inline">Punainen</p> tarkoittaa, että tehtävä on tehty mutta se meni väärin.</p>
                 <p>Tehtävätyyppejä on kaksi: monivalintatehtäviä, joissa vain valitset vaihtoehdon, ja saat palautteen, onko se oikein.</p>
                 <p>Toinen tehtävätyyppi on esseetehtävä, jossa on kysymys, ja vastattuasi tehtävä merkitään oikein tehdyksi ja näet mallivastauksen.</p>
+                <p>Voit yrittää jokaista tehtävää vain kerran.</p>
                 <p style="color: red">Jos poistut kurssilta, kaikki lähettämäsi tehtävien ratkaisut poistetaan!</p>
             </div>
         </div>
