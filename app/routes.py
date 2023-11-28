@@ -41,10 +41,10 @@ def login():
             else:
                 return redirect("/?loginfailed=2")
     else:
-        return render_template("login.html")
+        return render_template("/")
 
 
-@app.route("/accountcreated", methods=["POST"])
+@app.route("/accountcreated", methods=["GET", "POST"])
 def accountcreated():
     """Create an account and insert into the database."""
     username = request.form["username"]
@@ -57,10 +57,9 @@ def accountcreated():
         session["role"] = account_type
         session["user_id"] = user_id
         session["csrf_token"] = secrets.token_hex(16)
-        return render_template("accountcreated.html", username=request.form["username"])
+        return redirect("/?status=account_created")
     else:
         return redirect("/?status=account_exists")
-
 
 @app.route("/logout")
 def logout():

@@ -7,6 +7,9 @@
 <div class="container">
     <div class="row">
         <div class="col-4">
+            {% if request.args.get("status") == "account_created" %}
+            <b>Tilisi on luotu onnistuneesti!</b>
+            {% endif %}
             <h1>Tervetuloa!</h1>
             {% if session.role == "teacher" %}
             <h2>Olet kirjautuneena tilillä {{ session.username }} (opettajatili)</h2>
@@ -69,27 +72,26 @@
                 <input type="submit" value="Kirjaudu sisään" class="btn btn-primary">
             </form>
             <br>
+            {% if request.args.get("status") == "account_exists" %}
+            <b>Tuon niminen käyttäjätili on jo olemassa!</b>
+            <br>
+            {% endif %}
             <b>Tai jos sinulla ei ole vielä tiliä, luo tili:</b>
             <button onclick="displayDiv('registerForm')">Avaa lomake</button>
             <div id="registerForm" style="display: none">
-            {% if request.args.get("status") == "already_exists" %}
-            <b>Tuon niminen käyttäjätili on jo olemassa!</b>
-                <form action="accountcreated" method="POST"></form>
-                <div>
-                    <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
-                    <br>
-                    <input type="text" name="username" minlength="5" maxlength="20" required>
-                </div>
-                <div>
-                    <label for="password">Salasana (Vähintään 5 merkkiä)</label>
-                    <br>
-                    <input type="text" name="password" minlength="5" required>
-                </div>
+            <form action="/accountcreated" method="POST">
+                <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
+                <br>
+                <input type="text" name="username" minlength="5" maxlength="20" required>
+                <label for="password">Salasana (Vähintään 5 merkkiä)</label>
+                <br>
+                <input type="text" name="password" minlength="5" required>
+                <br>
                 Oletko opiskelija vai opettaja?
                 <br>
-                <input type="radio" id="student" name="role" value="student">
+                <input type="radio" id="student" name="role" value="student" required>
                 <label for="student">Opiskelija</label>
-                <input type="radio" id="teacher" name="role" value="teacher">
+                <input type="radio" id="teacher" name="role" value="teacher" required>
                 <label for="teacher">Opettaja</label>
                 <br>
                 <input type="submit" value="Luo tili" class="btn btn-primary">
