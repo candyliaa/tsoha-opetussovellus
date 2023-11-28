@@ -12,14 +12,14 @@
             {% if materials|length == 0 %}
             <b>Kurssilla ei ole materiaaleja.</b>
             {% else %}
-            <button onclick="openDiv('list-materials');" style="margin-bottom: 5px">Listaa tekstimateriaalit</button>
+            <button class="btn btn-secondary" onclick="openDiv('list-materials');" style="margin-bottom: 5px">Listaa tekstimateriaalit</button>
             <div id="list-materials" style="display: none">
                 {% for i in range(materials|length) %}
                 <b>{{ i + 1 }}. materiaali</b>
                 <br>
                 {{ materials[i][1] }}
                 <br>
-                <textarea style="resize: none" name="body" rows="5" cols="35" readonly>{{ materials[i][2] }}</textarea>
+                <textarea class="form-control" style="resize: none" name="body" rows="5" cols="35" readonly>{{ materials[i][2] }}</textarea>
                 <br style="margin-bottom: 5px">
                 {% endfor %}
             </div>
@@ -50,7 +50,7 @@
             <b>Ohjeita</b>
             <br>
             <p>Tällä sivulla voit tehdä valitun kurssin tehtäviä ja katsella tekstimateriaaleja, joita opettaja on lisännyt.</p>
-            <button onclick="openDiv('instructions')">Näytä ohjeet</button>
+            <button class="btn btn-secondary" onclick="openDiv('instructions')">Näytä ohjeet</button>
             <div id="instructions" style="display: none">
                 <p>Näet tehtävälistassa tehtävän numeron (esim. T1, eli tehtävä 1) ja värin, joka merkkaa, missä vaiheessa tehtävä on.</p> 
                 <p><p style="color: orange;display: inline">Oranssi</p> tarkoittaa, että tehtävä on tekemättä.</p>
