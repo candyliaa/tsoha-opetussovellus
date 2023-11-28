@@ -53,22 +53,25 @@
             {% endif %}
             <b>Kirjaudu sisään:</b>
             <form action="/login" method="POST">
-                <title>Kirjautuminen</title>
-                Käyttäjänimi: 
-                <br>
-                <input type="text" name="username" minlength="5" maxlength="20" required>
-                <br>
-                Salasana:
-                <br>
-                <input type="text" name="password" minlength="5" required>
-                <br>
-                Oletko opiskelija vai opettaja?
-                <br>
-                <input type="radio" id="student" name="role" value="student" required>
-                <label for="student">Opiskelija</label>
-                <input type="radio" id="teacher" name="role" value="teacher" required>
-                <label for="teacher">Opettaja</label>
-                <br>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Käyttäjänimi</label>
+                    <input class="form-control" type="text" name="username" id="username" minlength="5" maxlength="20" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Salasana</label>
+                    <input class="form-control" type="text" name="password" id="password" minlength="5" required>
+                </div>
+                <div class="mb-3">
+                    Oletko opiskelija vai opettaja?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="student" name="role" value="student" required>
+                        <label class="form-check-label" for="student">Opiskelija</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="teacher" name="role" value="teacher" required>
+                        <label class="form-check-label" for="teacher">Opettaja</label>
+                    </div>
+                </div>
                 <input type="submit" value="Kirjaudu sisään" class="btn btn-primary">
             </form>
             <br>
@@ -77,23 +80,28 @@
             <br>
             {% endif %}
             <b>Tai jos sinulla ei ole vielä tiliä, luo tili:</b>
-            <button onclick="displayDiv('registerForm')">Avaa lomake</button>
+            <button class="btn btn-secondary" onclick="displayDiv('registerForm')">Avaa lomake</button>
             <div id="registerForm" style="display: none">
             <form action="/accountcreated" method="POST">
-                <label for="username">Käyttäjänimi (5-20 merkkiä)</label>
-                <br>
-                <input type="text" name="username" minlength="5" maxlength="20" required>
-                <label for="password">Salasana (Vähintään 5 merkkiä)</label>
-                <br>
-                <input type="text" name="password" minlength="5" required>
-                <br>
-                Oletko opiskelija vai opettaja?
-                <br>
-                <input type="radio" id="student" name="role" value="student" required>
-                <label for="student">Opiskelija</label>
-                <input type="radio" id="teacher" name="role" value="teacher" required>
-                <label for="teacher">Opettaja</label>
-                <br>
+                <div class="mb-3">
+                    <label class="form-label" for="username">Käyttäjänimi (5-20 merkkiä)</label>
+                    <input class="form-control" type="text" name="username" minlength="5" maxlength="20" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Salasana (Vähintään 5 merkkiä)</label>
+                    <input class="form-control" type="text" name="password" minlength="5" required>
+                </div>
+                <div class="mb-3">
+                    Oletko opiskelija vai opettaja?
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="student" name="role" value="student" required>
+                        <label class="form-check-label" for="student">Opiskelija</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="teacher" name="role" value="teacher" required>
+                        <label class="form-check-label" for="teacher">Opettaja</label>
+                    </div>   
+                </div>
                 <input type="submit" value="Luo tili" class="btn btn-primary">
             </form>
             </div>
