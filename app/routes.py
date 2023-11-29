@@ -275,6 +275,7 @@ def exercises_materials():
     course_materials = course_data["materials"]
     course_exercises = course_data["course_exercises"]
     exercise_submissions = course_data["exercise_submissions"]
+    correct_submissions = course_data["correct_submissions"]
 
     submissions_dict = {}
     for submission in exercise_submissions:
@@ -286,6 +287,7 @@ def exercises_materials():
         exercises=course_exercises,
         submissions=submissions_dict,
         materials=course_materials,
+        correct_submissions=correct_submissions
     )
 
 

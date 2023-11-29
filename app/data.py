@@ -363,11 +363,17 @@ def exercises_and_materials(course_id: int, session: dict):
         {"course_id": course_id, "student_id": student_id},
     ).fetchall()
 
+    correct_submissions = 0
+    for submission in exercise_submissions:
+        if submission[1]:
+            correct_submissions += 1
+
     data_dict = {
         "course": course,
         "materials": materials,
         "course_exercises": course_exercises,
         "exercise_submissions": exercise_submissions,
+        "correct_submissions": correct_submissions
     }
 
     return data_dict
