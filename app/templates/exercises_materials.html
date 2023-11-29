@@ -45,6 +45,12 @@
             <a style="color: {{ col }};font-size: large" href="/do_exercise?course_id={{ course['id'] }}&exercise_id={{ exercises[i]['id'] }}&exercise_num={{ i + 1 }}">T{{ i + 1 }}</a>
             {% endfor %}
             {% endif %}
+            <br>
+            <p>Tehtäviä oikein:</p>
+            {% set progress = (((correct_submissions|int) / (exercises|length)) * 100)|round(1, 'ceil') %}
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">{{ progress }}%</div>
+            </div>
         </div>
         <div class="col-6">
             <b>Ohjeita</b>
@@ -55,8 +61,8 @@
                 <p>Näet tehtävälistassa tehtävän numeron (esim. T1, eli tehtävä 1) ja värin, joka merkkaa, missä vaiheessa tehtävä on.</p> 
                 <p><p style="color: green;display: inline">Vihreä</p> tarkoittaa, että tehtävä on tehty ja se meni oikein.</p>
                 <p><p style="color: red;display: inline">Punainen</p> tarkoittaa, että tehtävä on tehty mutta se meni väärin.</p>
-                <p><p style="color: orange;display: inline">Oranssi</p> tarkoittaa, että tehtävä on tekemättä.</p>
-                <p>Tehtävätyyppejä on kaksi: monivalintatehtäviä, joissa vain valitset vaihtoehdon, ja saat palautteen, onko se oikein.</p>
+                <p><p style="color: orange;display: inline">Keltainen</p> tarkoittaa, että tehtävä on tekemättä.</p>
+                <p>Tehtävätyyppejä on kaksi, joista ensimmäinen on monivalintatehtäviä, joissa vain valitset vaihtoehdon, ja saat palautteen, onko se oikein.</p>
                 <p>Toinen tehtävätyyppi on esseetehtävä, jossa on kysymys, ja vastattuasi tehtävä merkitään oikein tehdyksi ja näet mallivastauksen.</p>
                 <p>Voit yrittää jokaista tehtävää vain kerran.</p>
                 <p style="color: red">Jos poistut kurssilta, kaikki lähettämäsi tehtävien ratkaisut poistetaan!</p>
