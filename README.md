@@ -36,7 +36,7 @@ Clone the repository:
 ```
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
 ```
-Remove all Docker related files: `Dockerfile` in both the `app` and `db` dictionaries, as well as `compose.yaml.example`.
+Optionally, you can remove all Docker related files: `Dockerfile` in both the `app` and `db` dictionaries, as well as `compose.yaml.example`.
 Then, create a `.env` file in the `app` directory, and add two lines, one for the `SECRET_KEY`, and one for the `DATABASE_URL`. It should look like this:
 ```
 SECRET_KEY = <KEY_GOES_HERE>
@@ -50,6 +50,7 @@ $ python3
 ```
 As for the `DATABASE_URL`, you can input the following: `"postgresql://postgres@localhost/postgres"`. 
 Be mindful of the fact that this attempts to connect to a local database named `postgres`, which might already exist.
+The URL you have to use depends on your system, so the above may not work properly.
 
 Next, install all required packages with a virtual environment:
 ```
