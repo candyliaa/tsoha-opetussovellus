@@ -74,6 +74,7 @@ And again, if running locally on Linux, run:
 $ psql -h localhost -U postgres db/schema.sql
 ```
 instead.
+
 *Note:*
 You may have to start the `postgresql` service with the following command on Linux:
 ```
