@@ -61,10 +61,25 @@ Then, build the database using the schema:
 ```
 $ psql < db/schema.sql
 ```
+*If you have PSQL installed locally Linux, you should instead run*
+```
+psql -h localhost -U postgres < db/schema.sql
+```
 Optionally, you can also add some test data to the database:
 ```
 $ psql < db/test_data.sql
 ```
+And again, if running locally on Linux, run:
+```
+$ psql -h localhost -U postgres db/schema.sql
+```
+instead.
+*Note:*
+You may have to start the `postgresql` service with the following command on Linux:
+```
+$ service postgresql start
+```
+
 You can now run the app with the command
 ```
 $ flask run
