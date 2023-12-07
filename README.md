@@ -37,7 +37,7 @@ Clone the repository:
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
 ```
 Remove all Docker related files: `Dockerfile` in both the `app` and `db` dictionaries, as well as `compose.yaml.example`.
-Then, create a `.env` file, and add two lines, one for the `SECRET_KEY`, and one for the `DATABASE_URL`. It should look like this:
+Then, create a `.env` file in the `app` directory, and add two lines, one for the `SECRET_KEY`, and one for the `DATABASE_URL`. It should look like this:
 ```
 SECRET_KEY = <KEY_GOES_HERE>
 DATABASE_URL = <URL_GOES_HERE>
@@ -61,7 +61,7 @@ Then, build the database using the schema:
 ```
 $ psql < db/schema.sql
 ```
-*If you have PSQL installed locally Linux, you should instead run*
+**If you have PSQL installed locally Linux, you should instead run**
 ```
 psql -h localhost -U postgres < db/schema.sql
 ```
@@ -69,7 +69,7 @@ Optionally, you can also add some test data to the database:
 ```
 $ psql < db/test_data.sql
 ```
-And again, if running locally on Linux, run:
+**And again, if running locally on Linux, run:**
 ```
 $ psql -h localhost -U postgres db/schema.sql
 ```
@@ -85,7 +85,7 @@ You can now run the app with the command
 ```
 $ flask run
 ```
-
+Run the command in the `app` directory.
 # Current state of the app
 Although the app is mostly done functionality wise, the styling of the web pages is still to be improved. Some of the code in `routes.py` has been moved to `data.py` so that the logic in `routes.py` is easier to follow. The code has also been formatted using pylint and Black Formatter.
 There should be no security vulnerabilities (at least no SQL injection, XSS or CSRF attack risk). 
