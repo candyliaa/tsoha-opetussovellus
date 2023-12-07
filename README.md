@@ -88,5 +88,6 @@ $ flask run
 ```
 Run the command in the `app` directory.
 # Current state of the app
-Although the app is mostly done functionality wise, the styling of the web pages is still to be improved. Some of the code in `routes.py` has been moved to `data.py` so that the logic in `routes.py` is easier to follow. The code has also been formatted using pylint and Black Formatter.
+The code in `routes.py` has been moved to `data.py` so that the logic in `routes.py` is easier to follow. The code has also been formatted using pylint and Black Formatter.
+The app has been styled using Bootstrap and some css.
 There should be no security vulnerabilities (at least no SQL injection, XSS or CSRF attack risk). 
