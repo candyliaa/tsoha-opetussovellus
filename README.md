@@ -32,6 +32,7 @@ You can then open the app at [`http://localhost:8000`](http://localhost:8000) . 
 **Without Docker**
 
 Alternatively, the app can be ran without Docker.
+You will need a [local Postgres installation](https://ubuntu.com/server/docs/databases-postgresql). These instructions assume the user is using Ubuntu or an Ubuntu-based distro. For other distros and operating systems, the process may vary.
 Clone the repository:
 ```
 $ git clone https://github.com/candyliaa/tsoha-opetussovellus.git
@@ -58,6 +59,13 @@ $ python3 -m venv venv
 $ source venv/bin/activate
 $ pip install -r ./app/requirements.txt
 ```
+
+*Note:*
+You may have to start the `postgresql` service with the following command on Linux:
+```
+$ service postgresql start
+```
+
 Then, build the database using the schema:
 ```
 $ psql < db/schema.sql
@@ -72,15 +80,9 @@ $ psql < db/test_data.sql
 ```
 **And again, if running locally on Linux, run:**
 ```
-$ psql -h localhost -U postgres db/test_data.sql
+$ psql -h localhost -U postgres < db/test_data.sql
 ```
 instead.
-
-*Note:*
-You may have to start the `postgresql` service with the following command on Linux:
-```
-$ service postgresql start
-```
 
 You can now run the app with the command
 ```
